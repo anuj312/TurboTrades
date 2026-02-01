@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Intraday Boost — Live RFactor</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg0:#060813; --bg1:#0A1024;
+      --text:#EAF0FF;
+      --muted: rgba(234,240,255,.66);
+      --good:#41F7A0;
+      --bad:#FF4B7D;
+      --shadow: 0 16px 46px rgba(0,0,0,.55);
+      --shadow2: 0 10px 26px rgba(0,0,0,.42);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 520px at 18% 5%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 88% 10%, rgba(37,216,255,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    header{
+      position: sticky; top:0; z-index:10;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(6,8,19,.82), rgba(6,8,19,.35));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .topbar{
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 14px 18px;
+      display:flex; gap:14px; align-items:center; justify-content: space-between;
+    }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background:
+        radial-gradient(10px 10px at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 60%),
+        linear-gradient(135deg, rgba(124,92,255,.95), rgba(37,216,255,.90));
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 14px 34px rgba(124,92,255,.20), 0 12px 30px rgba(37,216,255,.12);
+    }
+    h1{ margin:0; font-size:16px; font-weight:800; letter-spacing:.2px; }
+    .subtitle{ margin-top:2px; font-size:12px; color:var(--muted); }
+
+    .controls{ display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; align-items:center; }
+    .pill{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 12px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      color: var(--muted); font-size:12px;
+      white-space: nowrap;
+    }
+    .dot{ width:8px; height:8px; border-radius:50%; background:#ffd166; box-shadow:0 0 0 5px rgba(255,209,102,.12); }
+    .dot.live{ background: var(--good); box-shadow:0 0 0 5px rgba(65,247,160,.12); }
+
+    input, select{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      outline: none;
+      min-width: 220px;
+    }
+    select{ min-width: 200px; }
+
+    .btn{
+      cursor:pointer;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(124,92,255,.90), rgba(37,216,255,.75));
+      color:#070B16;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 16px 40px rgba(124,92,255,.18);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .btn:active{ transform: translateY(0px); filter: brightness(.98); }
+
+    .wrap{ max-width: 1320px; margin: 0 auto; padding: 18px 18px 44px; }
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(420px 170px at 18% 0%, rgba(124,92,255,.15), transparent 55%),
+        radial-gradient(420px 170px at 92% 20%, rgba(37,216,255,.12), transparent 55%);
+      opacity:.8; pointer-events:none;
+    }
+    .card > *{ position:relative; }
+
+    .cardHead{
+      padding: 14px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .cardTitle{ font-weight:900; font-size:13px; letter-spacing:.2px; }
+    .badge{
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      font-family: var(--mono);
+      max-width: 520px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .kv{
+      display:grid; grid-template-columns: 1fr auto; gap:10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .kv:last-child{ border-bottom:none; }
+    .k{ color: rgba(234,240,255,.70); font-weight:700; font-size:12px; }
+    .v{ font-family: var(--mono); font-weight:900; font-size:12px; }
+
+    table{ width:100%; border-collapse: collapse; font-size: 13px; }
+    thead th{
+      text-align:left; font-size:11px;
+      color: rgba(234,240,255,.62);
+      font-weight:800;
+      padding: 10px 14px;
+      letter-spacing: .35px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      white-space: nowrap;
+    }
+    tbody td{
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    tbody tr:hover{ background: rgba(255,255,255,.04); }
+
+    .sym{ font-family: var(--mono); font-weight:900; }
+    .pos{ color: var(--good); font-weight:900; }
+    .neg{ color: var(--bad); font-weight:900; }
+    .rf{ font-family: var(--mono); font-weight:900; }
+    .muted{ color: var(--muted); }
+
+    .bar{
+      height: 8px; min-width:120px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block; height:100%; width:0%;
+      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(37,216,255,.90));
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+    .bar.down > i{
+      background: linear-gradient(90deg, rgba(255,75,125,.95), rgba(255,75,125,.70));
+    }
+
+    @media (max-width: 1100px){ .grid2{ grid-template-columns: 1fr; } }
+    @media (max-width: 860px){
+      .cards{ grid-template-columns: 1fr; }
+      input{ min-width: 180px; }
+      select{ min-width: 160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>Intraday Boost — Live RFactor</h1>
+          <div class="subtitle">Today vs last 20 sessions (Volume × Range × Move)</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="pill">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">WAITING</span>
+          <span class="muted" id="tsText"></span>
+        </div>
+
+        <div class="pill">
+          <span class="muted" id="clockText">IST —:—:—</span>
+          <span class="muted" id="sessionText">• Session —</span>
+        </div>
+
+        <div class="pill">
+          <span class="muted" id="tickText">Ticks — • —/s</span>
+        </div>
+
+        <select id="sectorFilter"><option value="">All sectors</option></select>
+        <input id="search" placeholder="Search symbol… (SBIN, RELIANCE)" />
+        <button class="btn" id="refreshBtn">Refresh</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="cards">
+      <div class="card">
+        <div class="cardHead"><div class="cardTitle">Universe</div><div class="badge" id="universeCount">—</div></div>
+        <div class="kv"><div class="k">Stocks scanned</div><div class="v" id="stocksScanned">—</div></div>
+        <div class="kv"><div class="k">Cache seeding</div><div class="v" id="cacheSeeding">—</div></div>
+        <div class="kv"><div class="k">Seeding symbol</div><div class="v" id="cacheSymbol">—</div></div>
+        <div class="kv"><div class="k">Cache status</div><div class="v" id="cacheStatus">—</div></div>
+        <div class="kv"><div class="k">Sectors</div><div class="v" id="sectorsCount">—</div></div>
+        <div class="kv"><div class="k">Refresh interval</div><div class="v" id="refreshEvery">—</div></div>
+      </div>
+
+      <div class="card">
+        <div class="cardHead"><div class="cardTitle">Top mover (|RFactor|)</div><div class="badge" id="topMoverBadge">—</div></div>
+        <div class="kv"><div class="k">Symbol</div><div class="v" id="topMoverSym">—</div></div>
+        <div class="kv"><div class="k">% Change</div><div class="v" id="topMoverPct">—</div></div>
+        <div class="kv"><div class="k">RFactor</div><div class="v" id="topMoverRf">—</div></div>
+      </div>
+
+      <div class="card">
+        <div class="cardHead"><div class="cardTitle">Sector leader (avg DirRFactor)</div><div class="badge" id="sectorLeaderBadge">—</div></div>
+        <div class="kv"><div class="k">Sector</div><div class="v" id="sectorLeader">—</div></div>
+        <div class="kv"><div class="k">Avg DirRFactor</div><div class="v" id="sectorLeaderDir">—</div></div>
+        <div class="kv"><div class="k">Avg |RFactor|</div><div class="v" id="sectorLeaderAbs">—</div></div>
+      </div>
+    </div>
+
+    <!-- Gainers + Losers side-by-side -->
+    <div class="grid2">
+      <div class="card">
+        <div class="cardHead">
+          <div class="cardTitle">Top 10 Gainers <span class="muted">(by RFactor)</span></div>
+          <div class="badge">LIVE</div>
+        </div>
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th class="muted">Sectors</th></tr></thead>
+            <tbody id="gainersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHead">
+          <div class="cardTitle">Top 10 Losers <span class="muted">(by RFactor)</span></div>
+          <div class="badge">LIVE</div>
+        </div>
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th class="muted">Sectors</th></tr></thead>
+            <tbody id="losersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sector ranking + Movers side-by-side -->
+    <div class="grid2" style="margin-top:16px">
+      <div class="card">
+        <div class="cardHead"><div class="cardTitle">Sector ranking</div><div class="badge">Avg DirRFactor</div></div>
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Sector</th><th>Count</th><th>Avg Dir</th><th>Avg |R|</th></tr></thead>
+            <tbody id="sectorsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHead"><div class="cardTitle">Top 10 Movers <span class="muted">(|RFactor|)</span></div><div class="badge">All</div></div>
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Symbol</th><th>Side</th><th>%</th><th>RFactor</th></tr></thead>
+            <tbody id="moversBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="cardHead"><div class="cardTitle">Backend status</div><div class="badge" id="noteBadge">WAITING FOR BACKEND…</div></div>
+      <div class="kv"><div class="k">Note</div><div class="v" id="noteText">Waiting for backend startup / seeding…</div></div>
+      <div class="kv"><div class="k">Missing symbols (not found in NSE)</div><div class="v" id="missingText">—</div></div>
+    </div>
+  </div>
+
+  <script>
+    const IST_OFFSET_MS = 330 * 60000;
+    let pollHandle = null;
+    let pollSec = 15;
+
+    const $ = (id) => document.getElementById(id);
+    const els = {
+      statusDot: $("statusDot"),
+      statusText: $("statusText"),
+      tsText: $("tsText"),
+
+      clockText: $("clockText"),
+      sessionText: $("sessionText"),
+      tickText: $("tickText"),
+
+      universeCount: $("universeCount"),
+      stocksScanned: $("stocksScanned"),
+      cacheSeeding: $("cacheSeeding"),
+      cacheSymbol: $("cacheSymbol"),
+      cacheStatus: $("cacheStatus"),
+      sectorsCount: $("sectorsCount"),
+      refreshEvery: $("refreshEvery"),
+
+      gainersBody: $("gainersBody"),
+      losersBody: $("losersBody"),
+      moversBody: $("moversBody"),
+      sectorsBody: $("sectorsBody"),
+
+      sectorFilter: $("sectorFilter"),
+      search: $("search"),
+      refreshBtn: $("refreshBtn"),
+
+      topMoverBadge: $("topMoverBadge"),
+      topMoverSym: $("topMoverSym"),
+      topMoverPct: $("topMoverPct"),
+      topMoverRf: $("topMoverRf"),
+
+      sectorLeaderBadge: $("sectorLeaderBadge"),
+      sectorLeader: $("sectorLeader"),
+      sectorLeaderDir: $("sectorLeaderDir"),
+      sectorLeaderAbs: $("sectorLeaderAbs"),
+
+      noteBadge: $("noteBadge"),
+      noteText: $("noteText"),
+      missingText: $("missingText"),
+    };
+
+    const fmtIST_HMS = new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false
+    });
+
+    function n2(x){
+      if (x === null || x === undefined || Number.isNaN(x)) return "—";
+      return Number(x).toFixed(2);
+    }
+    function signClass(x){ return (Number(x) >= 0) ? "pos" : "neg"; }
+    function sideLabel(p){ return (Number(p) >= 0) ? "UP" : "DOWN"; }
+
+    function setStatus(ok, msg){
+      els.statusDot.classList.toggle("live", !!ok);
+      els.statusText.textContent = msg;
+    }
+
+    function uniqueSectors(snap){
+      const set = new Set();
+      (snap.sectors||[]).forEach(s => set.add(s.sector));
+      (snap.gainers||[]).forEach(r => (r.sectors||[]).forEach(s => set.add(s)));
+      (snap.losers||[]).forEach(r => (r.sectors||[]).forEach(s => set.add(s)));
+      return Array.from(set).filter(Boolean).sort();
+    }
+
+    function fillSectorFilter(snap){
+      const secs = uniqueSectors(snap);
+      const cur = els.sectorFilter.value;
+      els.sectorFilter.innerHTML =
+        `<option value="">All sectors</option>` + secs.map(s => `<option value="${s}">${s}</option>`).join("");
+      if (secs.includes(cur)) els.sectorFilter.value = cur;
+    }
+
+    function applyFilters(rows, sector, q){
+      let out = rows || [];
+      const query = (q||"").trim().toUpperCase();
+
+      if (sector){
+        out = out.filter(r => (r.sectors||[]).includes(sector) || r.sector === sector);
+      }
+      if (query){
+        out = out.filter(r => ((r.symbol || r.sector || "")).toUpperCase().includes(query));
+      }
+      return out;
+    }
+
+    function boostWidth(rf, maxRf){
+      maxRf = maxRf || 1;
+      const w = Math.max(0, Math.min(1, (Number(rf)||0) / maxRf));
+      return Math.round(w * 100);
+    }
+
+    function renderList(tbody, rows, kind){
+      tbody.innerHTML = "";
+      const maxRf = Math.max(...rows.map(r => Number(r.rfactor)||0), 1);
+
+      rows.forEach(r => {
+        const w = boostWidth(r.rfactor, maxRf);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="sym">${r.symbol || "—"}</span></td>
+          <td class="${signClass(r.pct)}">${n2(r.pct)}</td>
+          <td class="rf">${n2(r.rfactor)}</td>
+          <td><div class="bar ${kind==='losers' ? 'down':''}"><i style="width:${w}%"></i></div></td>
+          <td class="muted">${(r.sectors||[]).join(", ")}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (!rows.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="5" class="muted" style="padding:14px">No rows</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderMovers(tbody, rows){
+      tbody.innerHTML = "";
+      rows.forEach(r => {
+        const pct = Number(r.pct)||0;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="sym">${r.symbol || "—"}</span></td>
+          <td class="${pct>=0 ? "pos":"neg"}">${sideLabel(pct)}</td>
+          <td class="${pct>=0 ? "pos":"neg"}">${n2(pct)}</td>
+          <td class="rf">${n2(r.rfactor)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      if (!rows.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="4" class="muted" style="padding:14px">No rows</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderSectors(tbody, sectors){
+      tbody.innerHTML = "";
+      sectors.forEach(s => {
+        const dir = Number(s.avg_dir_rfactor)||0;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="sym">${s.sector || "—"}</span></td>
+          <td class="muted">${s.count ?? "—"}</td>
+          <td class="rf ${dir>=0 ? "pos":"neg"}">${n2(s.avg_dir_rfactor)}</td>
+          <td class="rf">${n2(s.avg_abs_rfactor)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      if (!sectors.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="4" class="muted" style="padding:14px">No sectors</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderStats(snap){
+      els.tsText.textContent = snap.timestamp ? `• ${snap.timestamp}` : "";
+
+      els.universeCount.textContent = snap.universe_count ?? "—";
+      els.stocksScanned.textContent = snap.universe_count ?? "—";
+      els.sectorsCount.textContent = (snap.sectors || []).length;
+
+      const done = snap.cache_done ?? 0;
+      const total = snap.cache_total ?? 0;
+      els.cacheSeeding.textContent = (total > 0) ? `${done}/${total}` : "—";
+      els.cacheStatus.textContent = snap.cache_status || "—";
+      els.cacheSymbol.textContent =
+        (snap.cache_status === "SEEDING")
+          ? (snap.cache_current_symbol || "—")
+          : "—";
+
+      const sec = snap.refresh_every_sec ?? pollSec;
+      els.refreshEvery.textContent = `${sec}s`;
+
+      els.noteBadge.textContent = snap.note || "—";
+      els.noteText.textContent = snap.note || "—";
+      els.missingText.textContent = (snap.missing_symbols || []).join(", ") || "—";
+
+      const tc = snap.tick_count ?? 0;
+      const tps = snap.ticks_per_sec_inst ?? snap.ticks_per_sec_avg ?? null;
+      els.tickText.textContent = `Ticks ${tc} • ${tps === null ? "—" : Number(tps).toFixed(3)}/s`;
+
+      const topMover = (snap.movers || [])[0];
+      if (topMover){
+        els.topMoverBadge.textContent = sideLabel(topMover.pct);
+        els.topMoverSym.textContent = topMover.symbol || "—";
+        els.topMoverPct.textContent = n2(topMover.pct);
+        els.topMoverPct.className = "v " + signClass(topMover.pct);
+        els.topMoverRf.textContent = n2(topMover.rfactor);
+      } else {
+        els.topMoverBadge.textContent = "—";
+        els.topMoverSym.textContent = "—";
+        els.topMoverPct.textContent = "—";
+        els.topMoverRf.textContent = "—";
+      }
+
+      const leader = (snap.sectors || [])[0];
+      if (leader){
+        els.sectorLeaderBadge.textContent = (Number(leader.avg_dir_rfactor) >= 0) ? "BULL" : "BEAR";
+        els.sectorLeader.textContent = leader.sector || "—";
+        els.sectorLeaderDir.textContent = n2(leader.avg_dir_rfactor);
+        els.sectorLeaderDir.className = "v " + signClass(leader.avg_dir_rfactor);
+        els.sectorLeaderAbs.textContent = n2(leader.avg_abs_rfactor);
+      } else {
+        els.sectorLeaderBadge.textContent = "—";
+        els.sectorLeader.textContent = "—";
+        els.sectorLeaderDir.textContent = "—";
+        els.sectorLeaderAbs.textContent = "—";
+      }
+    }
+
+    // --- Header clock + session countdown (updates every second) ---
+    function fmtHMS(ms){
+      ms = Math.max(0, ms);
+      const s = Math.floor(ms/1000);
+      const hh = Math.floor(s/3600);
+      const mm = Math.floor((s%3600)/60);
+      const ss = s%60;
+      const pad2 = (n) => String(n).padStart(2,"0");
+      return `${pad2(hh)}:${pad2(mm)}:${pad2(ss)}`;
+    }
+
+    function parseISTDatetimeToUtcMs(s){
+      // "YYYY-MM-DD HH:MM:SS" in IST -> UTC ms (IST fixed offset)
+      if (!s) return null;
+      const parts = s.trim().split(" ");
+      if (parts.length !== 2) return null;
+      const [Y, M, D] = parts[0].split("-").map(Number);
+      const [h, m, sec] = parts[1].split(":").map(Number);
+      return Date.UTC(Y, M-1, D, h, m, sec) - IST_OFFSET_MS;
+    }
+
+    let lastSnap = {gainers:[], losers:[], movers:[], sectors:[], market:{}};
+
+    function updateHeaderClock(){
+      const now = new Date();
+      els.clockText.textContent = `IST ${fmtIST_HMS.format(now)}`;
+
+      const mkt = (lastSnap && lastSnap.market) ? lastSnap.market : null;
+      if (!mkt || !mkt.open || !mkt.close){
+        els.sessionText.textContent = "• Session —";
+        return;
+      }
+
+      const openUtc = parseISTDatetimeToUtcMs(mkt.open);
+      const closeUtc = parseISTDatetimeToUtcMs(mkt.close);
+      const state = mkt.state || "—";
+      const hhmm = `${mkt.open_hhmm || "09:15"}-${mkt.close_hhmm || "15:30"}`;
+
+      if (openUtc === null || closeUtc === null){
+        els.sessionText.textContent = `• ${state} • ${hhmm}`;
+        return;
+      }
+
+      if (state === "OPEN"){
+        els.sessionText.textContent = `• OPEN • ${hhmm} • Closes in ${fmtHMS(closeUtc - Date.now())}`;
+      } else if (state === "PREOPEN"){
+        els.sessionText.textContent = `• PREOPEN • ${hhmm} • Opens in ${fmtHMS(openUtc - Date.now())}`;
+      } else {
+        els.sessionText.textContent = `• CLOSED • ${hhmm} • Opens in ${fmtHMS(openUtc - Date.now())}`;
+      }
+    }
+
+    function renderAll(snap){
+      lastSnap = snap;
+      fillSectorFilter(snap);
+      renderStats(snap);
+
+      const sector = els.sectorFilter.value;
+      const query  = els.search.value;
+
+      const gainers = applyFilters(snap.gainers || [], sector, query).slice(0,10);
+      const losers  = applyFilters(snap.losers  || [], sector, query).slice(0,10);
+      const movers  = applyFilters(snap.movers  || [], sector, query).slice(0,10);
+
+      let sectors = snap.sectors || [];
+      sectors = sector ? sectors.filter(s => s.sector === sector) : sectors;
+
+      renderList(els.gainersBody, gainers, "gainers");
+      renderList(els.losersBody,  losers,  "losers");
+      renderMovers(els.moversBody, movers);
+      renderSectors(els.sectorsBody, sectors);
+    }
+
+    function setPolling(sec){
+      sec = Number(sec || 15);
+      sec = Math.max(3, Math.min(60, sec));
+      if (pollHandle) clearInterval(pollHandle);
+      pollSec = sec;
+      pollHandle = setInterval(loadSnapshot, pollSec * 1000);
+    }
+
+    async function loadSnapshot(){
+      try{
+        const res = await fetch(`/api/snapshot?t=${Date.now()}`, {cache:"no-store"});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const snap = await res.json();
+
+        // Status label based on cache state
+        const cs = snap.cache_status || "";
+        if (cs === "SEEDING" || cs === "BOOTSTRAP") setStatus(true, cs);
+        else setStatus(true, "LIVE");
+
+        renderAll(snap);
+
+        const backendSec = snap.refresh_every_sec;
+        if (backendSec && backendSec !== pollSec){
+          setPolling(backendSec);
+        }
+      } catch(e){
+        // Backend not reachable (or restarting)
+        setStatus(false, "WAITING");
+        els.noteBadge.textContent = "WAITING FOR BACKEND…";
+        els.noteText.textContent = "Waiting for application startup / seeding…";
+      }
+    }
+
+    els.refreshBtn.addEventListener("click", loadSnapshot);
+    els.sectorFilter.addEventListener("change", () => renderAll(lastSnap));
+    els.search.addEventListener("input", () => renderAll(lastSnap));
+
+    // start
+    loadSnapshot().then(() => setPolling(15));
+    setInterval(updateHeaderClock, 1000);
+    updateHeaderClock();
+  </script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+{
+  "timestamp": "2026-02-01 17:41:00",
+  "universe_count": 181,
+  "gainers": [
+    {
+      "symbol": "PAYTM",
+      "pct": 1.8725274725274683,
+      "rfactor": 10.72967592614178,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "CGPOWER",
+      "pct": 2.2001540963958606,
+      "rfactor": 7.732741235427687,
+      "sectors": [
+        "ENERGY"
+      ]
+    },
+    {
+      "symbol": "MAXHEALTH",
+      "pct": 2.079849498327769,
+      "rfactor": 6.013527716687551,
+      "sectors": [
+        "FINANCE",
+        "NIFTY_50"
+      ]
+    },
+    {
+      "symbol": "CONCOR",
+      "pct": 0.6172224987556043,
+      "rfactor": 5.599253655665715,
+      "sectors": [
+        "MIDCAP"
+      ]
+    },
+    {
+      "symbol": "PRESTIGE",
+      "pct": 2.654806705439614,
+      "rfactor": 5.262597531728241,
+      "sectors": [
+        "REALTY"
+      ]
+    },
+    {
+      "symbol": "WIPRO",
+      "pct": 2.068383284086115,
+      "rfactor": 4.862496633004388,
+      "sectors": [
+        "IT",
+        "NIFTY_50"
+      ]
+    },
+    {
+      "symbol": "TCS",
+      "pct": 2.016709881878421,
+      "rfactor": 4.317378699011052,
+      "sectors": [
+        "IT",
+        "NIFTY_50"
+      ]
+    },
+    {
+      "symbol": "PFC",
+      "pct": 0.5667589297482476,
+      "rfactor": 2.8579103782989375,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "KAYNES",
+      "pct": 2.43712953904586,
+      "rfactor": 2.5819630211717315,
+      "sectors": [
+        "IT"
+      ]
+    },
+    {
+      "symbol": "INFY",
+      "pct": 0.8226691042047531,
+      "rfactor": 1.9076621429373406,
+      "sectors": [
+        "IT",
+        "NIFTY_50"
+      ]
+    }
+  ],
+  "losers": [
+    {
+      "symbol": "BSE",
+      "pct": -7.826242402574191,
+      "rfactor": 105.85421995553659,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "BEL",
+      "pct": -5.267260579064583,
+      "rfactor": 79.16616499476432,
+      "sectors": [
+        "NIFTY_50"
+      ]
+    },
+    {
+      "symbol": "MAZDOCK",
+      "pct": -6.933810097555291,
+      "rfactor": 73.34480993566021,
+      "sectors": [
+        "ENERGY"
+      ]
+    },
+    {
+      "symbol": "BDL",
+      "pct": -10.018203094526077,
+      "rfactor": 64.08353314734012,
+      "sectors": [
+        "ENERGY"
+      ]
+    },
+    {
+      "symbol": "ANGELONE",
+      "pct": -8.969262859616675,
+      "rfactor": 57.320743589050366,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "CDSL",
+      "pct": -6.809574306923199,
+      "rfactor": 55.935404390842265,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "NUVAMA",
+      "pct": -7.365839155641455,
+      "rfactor": 54.118044322726966,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "IRFC",
+      "pct": -5.462114904246452,
+      "rfactor": 50.806869317983285,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "RVNL",
+      "pct": -4.906814210832838,
+      "rfactor": 37.93757175207813,
+      "sectors": [
+        "MIDCAP"
+      ]
+    },
+    {
+      "symbol": "SBIN",
+      "pct": -5.472775379473615,
+      "rfactor": 37.86594310434659,
+      "sectors": [
+        "PSUS",
+        "BANK",
+        "NIFTY_50"
+      ]
+    }
+  ],
+  "movers": [
+    {
+      "symbol": "BSE",
+      "pct": -7.826242402574191,
+      "rfactor": 105.85421995553659,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "BEL",
+      "pct": -5.267260579064583,
+      "rfactor": 79.16616499476432,
+      "sectors": [
+        "NIFTY_50"
+      ]
+    },
+    {
+      "symbol": "MAZDOCK",
+      "pct": -6.933810097555291,
+      "rfactor": 73.34480993566021,
+      "sectors": [
+        "ENERGY"
+      ]
+    },
+    {
+      "symbol": "BDL",
+      "pct": -10.018203094526077,
+      "rfactor": 64.08353314734012,
+      "sectors": [
+        "ENERGY"
+      ]
+    },
+    {
+      "symbol": "ANGELONE",
+      "pct": -8.969262859616675,
+      "rfactor": 57.320743589050366,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "CDSL",
+      "pct": -6.809574306923199,
+      "rfactor": 55.935404390842265,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "NUVAMA",
+      "pct": -7.365839155641455,
+      "rfactor": 54.118044322726966,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "IRFC",
+      "pct": -5.462114904246452,
+      "rfactor": 50.806869317983285,
+      "sectors": [
+        "FINANCE"
+      ]
+    },
+    {
+      "symbol": "RVNL",
+      "pct": -4.906814210832838,
+      "rfactor": 37.93757175207813,
+      "sectors": [
+        "MIDCAP"
+      ]
+    },
+    {
+      "symbol": "SBIN",
+      "pct": -5.472775379473615,
+      "rfactor": 37.86594310434659,
+      "sectors": [
+        "PSUS",
+        "BANK",
+        "NIFTY_50"
+      ]
+    }
+  ],
+  "sectors": [
+    {
+      "sector": "IT",
+      "count": 17,
+      "avg_dir_rfactor": -0.6645399946472187,
+      "avg_abs_rfactor": 2.59874278953014
+    },
+    {
+      "sector": "PHARMA",
+      "count": 15,
+      "avg_dir_rfactor": -0.7718156833611275,
+      "avg_abs_rfactor": 1.1779787361761715
+    },
+    {
+      "sector": "FMCG",
+      "count": 17,
+      "avg_dir_rfactor": -1.2933124248425378,
+      "avg_abs_rfactor": 1.5857820161744673
+    },
+    {
+      "sector": "REALTY",
+      "count": 8,
+      "avg_dir_rfactor": -1.4908702687540911,
+      "avg_abs_rfactor": 2.8065196516861515
+    },
+    {
+      "sector": "MIDCAP",
+      "count": 24,
+      "avg_dir_rfactor": -3.217830974974096,
+      "avg_abs_rfactor": 3.847250086814803
+    },
+    {
+      "sector": "AUTO",
+      "count": 16,
+      "avg_dir_rfactor": -4.317440119971965,
+      "avg_abs_rfactor": 4.317440119971965
+    },
+    {
+      "sector": "BANK",
+      "count": 12,
+      "avg_dir_rfactor": -4.574670764178572,
+      "avg_abs_rfactor": 4.574670764178572
+    },
+    {
+      "sector": "NIFTY_50",
+      "count": 49,
+      "avg_dir_rfactor": -5.047517787685585,
+      "avg_abs_rfactor": 5.848693983487983
+    },
+    {
+      "sector": "METAL",
+      "count": 11,
+      "avg_dir_rfactor": -5.145736737927451,
+      "avg_abs_rfactor": 5.15935397145417
+    },
+    {
+      "sector": "CEMENT",
+      "count": 4,
+      "avg_dir_rfactor": -5.442910583954577,
+      "avg_abs_rfactor": 5.442910583954577
+    },
+    {
+      "sector": "ENERGY",
+      "count": 26,
+      "avg_dir_rfactor": -7.685491629197721,
+      "avg_abs_rfactor": 8.385721863180937
+    },
+    {
+      "sector": "FINANCE",
+      "count": 29,
+      "avg_dir_rfactor": -13.810578429180262,
+      "avg_abs_rfactor": 15.256114872481055
+    },
+    {
+      "sector": "PSUS",
+      "count": 7,
+      "avg_dir_rfactor": -14.772666863357799,
+      "avg_abs_rfactor": 14.772666863357799
+    }
+  ],
+  "missing_symbols": [],
+  "note": "OK"
+}
