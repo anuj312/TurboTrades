@@ -11,67 +11,120 @@
 
   <style>
     :root{
-      --bg0:#060813; --bg1:#0A1024;
-      --text:#EAF0FF;
-      --muted: rgba(234,240,255,.66);
-      --good:#41F7A0;
-      --bad:#FF4B7D;
-      --shadow: 0 16px 46px rgba(0,0,0,.55);
-      --shadow2: 0 10px 26px rgba(0,0,0,.42);
+      --bg0:#070A12;
+      --bg1:#0B1222;
+      --card: rgba(255,255,255,.055);
+      --card2: rgba(255,255,255,.035);
+
+      --text:#EEF2FF;
+      --muted: rgba(238,242,255,.68);
+
+      --accent:#7C5CFF;
+      --accent2:#22D3EE;
+      --gold:#D7B56D;
+
+      --good:#22C55E;
+      --bad:#FB7185;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 12px 28px rgba(0,0,0,.42);
       --radius: 18px;
+
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+
     body{
-      margin:0; color:var(--text);
+      margin:0;
+      color:var(--text);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:
-        radial-gradient(900px 520px at 18% 5%, rgba(124,92,255,.22), transparent 60%),
-        radial-gradient(900px 520px at 88% 10%, rgba(37,216,255,.16), transparent 60%),
+        radial-gradient(900px 520px at 16% 6%, rgba(124,92,255,.18), transparent 60%),
+        radial-gradient(900px 520px at 88% 8%, rgba(34,211,238,.12), transparent 60%),
+        radial-gradient(1200px 700px at 50% 110%, rgba(215,181,109,.08), transparent 60%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
     }
 
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.16;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.055) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(900px 520px at 50% 0%, rgba(0,0,0,1), rgba(0,0,0,0));
+    }
+
     header{
       position: sticky; top:0; z-index:10;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: linear-gradient(180deg, rgba(6,8,19,.82), rgba(6,8,19,.35));
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.55));
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
+
     .topbar{
       max-width: 1320px;
       margin: 0 auto;
       padding: 14px 18px;
-      display:flex; gap:14px; align-items:center; justify-content: space-between;
+      display:flex; gap:14px;
+      align-items:center;
+      justify-content: space-between;
     }
+
     .brand{ display:flex; gap:12px; align-items:center; }
+
     .logo{
       width:38px; height:38px; border-radius:12px;
       background:
-        radial-gradient(10px 10px at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 60%),
-        linear-gradient(135deg, rgba(124,92,255,.95), rgba(37,216,255,.90));
+        radial-gradient(12px 12px at 30% 28%, rgba(255,255,255,.92), rgba(255,255,255,0) 60%),
+        linear-gradient(135deg, rgba(124,92,255,.95), rgba(34,211,238,.85));
       border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 14px 34px rgba(124,92,255,.20), 0 12px 30px rgba(37,216,255,.12);
+      box-shadow:
+        0 18px 44px rgba(124,92,255,.22),
+        0 14px 36px rgba(34,211,238,.12);
     }
-    h1{ margin:0; font-size:16px; font-weight:800; letter-spacing:.2px; }
+
+    h1{ margin:0; font-size:16px; font-weight:850; letter-spacing:.2px; }
     .subtitle{ margin-top:2px; font-size:12px; color:var(--muted); }
 
-    .controls{ display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; align-items:center; }
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
     .pill{
       display:flex; align-items:center; gap:10px;
-      padding: 10px 12px; border-radius:999px;
-      background: rgba(255,255,255,.06);
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: var(--shadow2);
-      color: var(--muted); font-size:12px;
+      color: var(--muted);
+      font-size:12px;
       white-space: nowrap;
     }
-    .dot{ width:8px; height:8px; border-radius:50%; background:#ffd166; box-shadow:0 0 0 5px rgba(255,209,102,.12); }
-    .dot.live{ background: var(--good); box-shadow:0 0 0 5px rgba(65,247,160,.12); }
+
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--gold);
+      box-shadow:0 0 0 5px rgba(215,181,109,.12);
+    }
+    .dot.live{
+      background: var(--good);
+      box-shadow:0 0 0 5px rgba(34,197,94,.14);
+    }
 
     input, select{
-      background: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.045);
       border: 1px solid rgba(255,255,255,.10);
       color: var(--text);
       border-radius: 12px;
@@ -79,25 +132,40 @@
       font-size: 13px;
       outline: none;
       min-width: 220px;
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
     }
+
+    input::placeholder{ color: rgba(238,242,255,.45); }
+
+    input:focus, select:focus{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.16);
+      background: rgba(255,255,255,.06);
+    }
+
     select{ min-width: 200px; }
 
     .btn{
       cursor:pointer;
       border: 1px solid rgba(255,255,255,.12);
-      background: linear-gradient(135deg, rgba(124,92,255,.90), rgba(37,216,255,.75));
-      color:#070B16;
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(34,211,238,.70));
+      color:#06101A;
       padding: 10px 14px;
       border-radius: 12px;
-      font-weight: 800;
+      font-weight: 850;
       font-size: 13px;
-      box-shadow: 0 16px 40px rgba(124,92,255,.18);
-      transition: transform .12s ease, filter .12s ease;
+      box-shadow: 0 18px 46px rgba(124,92,255,.18);
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
     }
-    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
-    .btn:active{ transform: translateY(0px); filter: brightness(.98); }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.04); box-shadow: 0 20px 56px rgba(124,92,255,.22); }
+    .btn:active{ transform: translateY(0px); filter: brightness(.99); }
 
-    .wrap{ max-width: 1320px; margin: 0 auto; padding: 18px 18px 44px; }
+    .wrap{
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 18px 18px 44px;
+      position: relative;
+    }
 
     .cards{
       display:grid;
@@ -114,20 +182,31 @@
     }
 
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      background: linear-gradient(180deg, var(--card), var(--card2));
       border: 1px solid rgba(255,255,255,.10);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow:hidden;
       position: relative;
     }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:0 0 auto 0;
+      height:2px;
+      background: linear-gradient(90deg, rgba(124,92,255,.75), rgba(34,211,238,.55), rgba(215,181,109,.38));
+      opacity:.55;
+    }
+
     .card::before{
       content:"";
       position:absolute; inset:-2px;
       background:
-        radial-gradient(420px 170px at 18% 0%, rgba(124,92,255,.15), transparent 55%),
-        radial-gradient(420px 170px at 92% 20%, rgba(37,216,255,.12), transparent 55%);
-      opacity:.8; pointer-events:none;
+        radial-gradient(520px 190px at 18% 0%, rgba(124,92,255,.12), transparent 55%),
+        radial-gradient(520px 190px at 92% 20%, rgba(34,211,238,.10), transparent 55%);
+      opacity:.9;
+      pointer-events:none;
     }
     .card > *{ position:relative; }
 
@@ -137,13 +216,14 @@
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .cardTitle{ font-weight:900; font-size:13px; letter-spacing:.2px; }
+
     .badge{
       font-size: 11px;
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 999px;
-      background: rgba(255,255,255,.07);
+      background: rgba(255,255,255,.05);
       border: 1px solid rgba(255,255,255,.10);
-      color: var(--muted);
+      color: rgba(238,242,255,.70);
       font-family: var(--mono);
       max-width: 520px;
       overflow:hidden;
@@ -152,54 +232,236 @@
     }
 
     .kv{
-      display:grid; grid-template-columns: 1fr auto; gap:10px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
       padding: 12px 14px;
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
     .kv:last-child{ border-bottom:none; }
-    .k{ color: rgba(234,240,255,.70); font-weight:700; font-size:12px; }
+    .k{ color: rgba(238,242,255,.70); font-weight:750; font-size:12px; }
     .v{ font-family: var(--mono); font-weight:900; font-size:12px; }
 
-    table{ width:100%; border-collapse: collapse; font-size: 13px; }
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
     thead th{
-      text-align:left; font-size:11px;
-      color: rgba(234,240,255,.62);
-      font-weight:800;
+      text-align:left;
+      font-size:11px;
+      color: rgba(238,242,255,.60);
+      font-weight:850;
       padding: 10px 14px;
       letter-spacing: .35px;
       text-transform: uppercase;
       border-bottom: 1px solid rgba(255,255,255,.08);
       white-space: nowrap;
+
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.60));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1;
     }
+
     tbody td{
       padding: 10px 14px;
       border-bottom: 1px solid rgba(255,255,255,.06);
       vertical-align: middle;
       white-space: nowrap;
     }
-    tbody tr:hover{ background: rgba(255,255,255,.04); }
 
-    .sym{ font-family: var(--mono); font-weight:900; }
+    tbody tr:hover{ background: rgba(255,255,255,.035); }
+
+    .sym{ font-family: var(--mono); font-weight:900; letter-spacing:.2px; }
+    .symLink{ color: rgba(238,242,255,.92); text-decoration:none; }
+    .symLink:hover{ text-decoration: underline; color: #FFFFFF; }
+
     .pos{ color: var(--good); font-weight:900; }
     .neg{ color: var(--bad); font-weight:900; }
     .rf{ font-family: var(--mono); font-weight:900; }
     .muted{ color: var(--muted); }
 
     .bar{
-      height: 8px; min-width:120px;
+      height: 8px;
+      min-width: 120px;
       border-radius: 999px;
-      background: rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.10);
       overflow:hidden;
     }
+
     .bar > i{
-      display:block; height:100%; width:0%;
-      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(37,216,255,.90));
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(34,211,238,.85));
       border-radius: 999px;
       transition: width .35s ease;
     }
+
     .bar.down > i{
-      background: linear-gradient(90deg, rgba(255,75,125,.95), rgba(255,75,125,.70));
+      background: linear-gradient(90deg, rgba(251,113,133,.95), rgba(251,113,133,.65));
+    }
+
+    /* -------- Sector Histogram (fixed axis -10..+10) -------- */
+    .sectorChartWrap{
+      padding: 12px 14px 6px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .sectorChartGrid{
+      display:grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .yAxis{
+      position: relative;
+      height: 460px; /* taller */
+      border-right: 1px solid rgba(255,255,255,.10);
+    }
+    .yTick{
+      position:absolute;
+      left:0;
+      transform: translateY(50%);
+      width: 100%;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(238,242,255,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .chartScroll{
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-bottom: 10px;
+    }
+
+    .chart{
+      position: relative;
+      height: 560px; /* taller */
+      min-width: 980px;
+      border-radius: 14px;
+      background:
+        radial-gradient(520px 220px at 20% 0%, rgba(124,92,255,.10), transparent 60%),
+        radial-gradient(520px 220px at 92% 20%, rgba(34,211,238,.08), transparent 60%),
+        rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .gridLine{
+      position:absolute;
+      left:0; right:0;
+      height:1px;
+      background: rgba(255,255,255,.08);
+      pointer-events:none;
+    }
+    .zeroLine{
+      background: rgba(255,255,255,.14);
+    }
+
+    .bars{
+      position:absolute;
+      inset: 0;
+      display:flex;
+      align-items: stretch;
+      gap: 18px;
+      padding: 14px 16px 12px;
+    }
+
+    .col{
+      width: 56px;
+      flex: 0 0 auto;
+      position: relative;
+      height: 100%;
+      display:flex;
+      align-items: stretch;
+      justify-content:center;
+      cursor: default;
+    }
+
+    .pillBar{
+      position:absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      border-radius: 999px;
+      box-shadow:
+        0 10px 24px rgba(0,0,0,.30),
+        0 0 0 1px rgba(255,255,255,.10) inset;
+      transition: filter .12s ease, transform .12s ease;
+    }
+
+    .pillBar.up{
+      background: linear-gradient(180deg, rgba(34,197,94,.95), rgba(34,197,94,.55));
+      filter: drop-shadow(0 10px 18px rgba(34,197,94,.12));
+    }
+
+    .pillBar.down{
+      background: linear-gradient(180deg, rgba(251,113,133,.55), rgba(251,113,133,.95));
+      filter: drop-shadow(0 10px 18px rgba(251,113,133,.12));
+    }
+
+    .col:hover .pillBar{
+      filter: brightness(1.05) saturate(1.05);
+      transform: translateX(-50%) scaleX(1.02);
+    }
+
+    .xLabel{
+      position:absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-90deg);
+      transform-origin: center;
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(238,242,255,.55);
+      letter-spacing: .3px;
+      white-space: nowrap;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .chartTooltip{
+      position: fixed;
+      z-index: 9999;
+      display:none;
+      min-width: 160px;
+      background: rgba(255,255,255,.95);
+      color: #0B1020;
+      border-radius: 10px;
+      padding: 10px 12px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .ttTitle{
+      font-weight: 900;
+      letter-spacing: .2px;
+      margin-bottom: 6px;
+    }
+    .ttRow{
+      display:flex; align-items:center; gap:8px;
+      font-family: var(--mono);
+      font-weight: 900;
+    }
+    .ttDot{
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #22C55E;
+      box-shadow: 0 0 0 4px rgba(34,197,94,.18);
+    }
+    .ttDot.down{
+      background: #FB7185;
+      box-shadow: 0 0 0 4px rgba(251,113,133,.18);
     }
 
     @media (max-width: 1100px){ .grid2{ grid-template-columns: 1fr; } }
@@ -207,6 +469,9 @@
       .cards{ grid-template-columns: 1fr; }
       input{ min-width: 180px; }
       select{ min-width: 160px; }
+      .sectorChartGrid{ grid-template-columns: 36px 1fr; }
+      .yAxis{ height: 300px; }
+      .chart{ height: 300px; min-width: 820px; }
     }
   </style>
 </head>
@@ -235,7 +500,7 @@
         </div>
 
         <div class="pill">
-          <span class="muted" id="tickText">Ticks — • —/s</span>
+          <span class="muted" id="tickText">Ticks — total • —/s</span>
         </div>
 
         <select id="sectorFilter"><option value="">All sectors</option></select>
@@ -265,14 +530,14 @@
       </div>
 
       <div class="card">
-        <div class="cardHead"><div class="cardTitle">Sector leader (avg DirRFactor)</div><div class="badge" id="sectorLeaderBadge">—</div></div>
+        <div class="cardHead"><div class="cardTitle">Sector leader</div><div class="badge" id="sectorLeaderBadge">—</div></div>
         <div class="kv"><div class="k">Sector</div><div class="v" id="sectorLeader">—</div></div>
         <div class="kv"><div class="k">Avg DirRFactor</div><div class="v" id="sectorLeaderDir">—</div></div>
         <div class="kv"><div class="k">Avg |RFactor|</div><div class="v" id="sectorLeaderAbs">—</div></div>
       </div>
     </div>
 
-    <!-- Gainers + Losers side-by-side -->
+    <!-- Gainers + Losers -->
     <div class="grid2">
       <div class="card">
         <div class="cardHead">
@@ -281,7 +546,7 @@
         </div>
         <div style="overflow:auto">
           <table>
-            <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th class="muted">Sectors</th></tr></thead>
+            <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th>DirR</th></tr></thead>
             <tbody id="gainersBody"></tbody>
           </table>
         </div>
@@ -294,33 +559,34 @@
         </div>
         <div style="overflow:auto">
           <table>
-            <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th class="muted">Sectors</th></tr></thead>
+            <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th>DirR</th></tr></thead>
             <tbody id="losersBody"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- Sector ranking + Movers side-by-side -->
-    <div class="grid2" style="margin-top:16px">
-      <div class="card">
-        <div class="cardHead"><div class="cardTitle">Sector ranking</div><div class="badge">Avg DirRFactor</div></div>
-        <div style="overflow:auto">
-          <table>
-            <thead><tr><th>Sector</th><th>Count</th><th>Avg Dir</th><th>Avg |R|</th></tr></thead>
-            <tbody id="sectorsBody"></tbody>
-          </table>
+    <!-- Sector Ranking (FULL WIDTH) -->
+    <div class="card" style="margin-top:16px">
+      <div class="cardHead">
+        <div class="cardTitle">Sector ranking</div>
+        <div class="badge">Histogram • DirRFactor • Axis -10…+10</div>
+      </div>
+
+      <div class="sectorChartWrap">
+        <div class="sectorChartGrid">
+          <div class="yAxis" id="sectorYAxis"></div>
+          <div class="chartScroll">
+            <div class="chart" id="sectorChart"></div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="cardHead"><div class="cardTitle">Top 10 Movers <span class="muted">(|RFactor|)</span></div><div class="badge">All</div></div>
-        <div style="overflow:auto">
-          <table>
-            <thead><tr><th>Symbol</th><th>Side</th><th>%</th><th>RFactor</th></tr></thead>
-            <tbody id="moversBody"></tbody>
-          </table>
-        </div>
+      <div style="overflow:auto">
+        <table>
+          <thead><tr><th>Sector</th><th>Count</th><th>Avg Dir</th><th>Avg |R|</th></tr></thead>
+          <tbody id="sectorsBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -331,10 +597,23 @@
     </div>
   </div>
 
+  <div class="chartTooltip" id="sectorTooltip">
+    <div class="ttTitle" id="ttTitle">—</div>
+    <div class="ttRow">
+      <span class="ttDot" id="ttDot"></span>
+      <span id="ttValue">—</span>
+    </div>
+  </div>
+
   <script>
     const IST_OFFSET_MS = 330 * 60000;
     let pollHandle = null;
     let pollSec = 15;
+
+    // tick interpolation (UI updates every second, even if snapshot polls slower)
+    let lastTickCount = 0;
+    let lastTickRate = 0;      // ticks/sec
+    let lastTickRecvMs = 0;    // when snapshot arrived
 
     const $ = (id) => document.getElementById(id);
     const els = {
@@ -356,7 +635,6 @@
 
       gainersBody: $("gainersBody"),
       losersBody: $("losersBody"),
-      moversBody: $("moversBody"),
       sectorsBody: $("sectorsBody"),
 
       sectorFilter: $("sectorFilter"),
@@ -376,6 +654,13 @@
       noteBadge: $("noteBadge"),
       noteText: $("noteText"),
       missingText: $("missingText"),
+
+      sectorChart: $("sectorChart"),
+      sectorYAxis: $("sectorYAxis"),
+      sectorTooltip: $("sectorTooltip"),
+      ttTitle: $("ttTitle"),
+      ttDot: $("ttDot"),
+      ttValue: $("ttValue"),
     };
 
     const fmtIST_HMS = new Intl.DateTimeFormat("en-IN", {
@@ -384,16 +669,38 @@
       hour12: false
     });
 
+    function tvUrl(sym){
+      if (!sym || sym === "—") return "#";
+      return `https://www.tradingview.com/chart/?symbol=NSE:${encodeURIComponent(sym)}&interval=5`;
+    }
+
     function n2(x){
       if (x === null || x === undefined || Number.isNaN(x)) return "—";
       return Number(x).toFixed(2);
     }
+
     function signClass(x){ return (Number(x) >= 0) ? "pos" : "neg"; }
     function sideLabel(p){ return (Number(p) >= 0) ? "UP" : "DOWN"; }
 
     function setStatus(ok, msg){
       els.statusDot.classList.toggle("live", !!ok);
       els.statusText.textContent = msg;
+    }
+
+    function updateTickLive(){
+      const base = Number(lastTickCount) || 0;
+      const rate = Number(lastTickRate) || 0;
+
+      if (!lastTickRecvMs){
+        els.tickText.textContent = `Ticks — total • —/s`;
+        return;
+      }
+
+      const dtSec = Math.max(0, (Date.now() - lastTickRecvMs) / 1000);
+      const est = Math.max(0, Math.floor(base + dtSec * rate));  // estimated total ticks
+
+      const rateText = rate ? rate.toFixed(3) : "—";
+      els.tickText.textContent = `Ticks ${est} total • ${rateText}/s`;
     }
 
     function uniqueSectors(snap){
@@ -437,13 +744,23 @@
 
       rows.forEach(r => {
         const w = boostWidth(r.rfactor, maxRf);
+
+        // DirR = sign(pct) * rfactor
+        const pct = Number(r.pct) || 0;
+        const rf = Number(r.rfactor) || 0;
+        const dirR = (pct >= 0 ? 1 : -1) * rf;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td><span class="sym">${r.symbol || "—"}</span></td>
-          <td class="${signClass(r.pct)}">${n2(r.pct)}</td>
-          <td class="rf">${n2(r.rfactor)}</td>
+          <td>
+            <a class="sym symLink" href="${tvUrl(r.symbol)}" target="_blank" rel="noopener noreferrer">
+              ${r.symbol || "—"}
+            </a>
+          </td>
+          <td class="${signClass(pct)}">${n2(pct)}</td>
+          <td class="rf">${n2(rf)}</td>
           <td><div class="bar ${kind==='losers' ? 'down':''}"><i style="width:${w}%"></i></div></td>
-          <td class="muted">${(r.sectors||[]).join(", ")}</td>
+          <td class="rf ${dirR >= 0 ? "pos":"neg"}">${n2(dirR)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -455,27 +772,7 @@
       }
     }
 
-    function renderMovers(tbody, rows){
-      tbody.innerHTML = "";
-      rows.forEach(r => {
-        const pct = Number(r.pct)||0;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><span class="sym">${r.symbol || "—"}</span></td>
-          <td class="${pct>=0 ? "pos":"neg"}">${sideLabel(pct)}</td>
-          <td class="${pct>=0 ? "pos":"neg"}">${n2(pct)}</td>
-          <td class="rf">${n2(r.rfactor)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-      if (!rows.length){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="4" class="muted" style="padding:14px">No rows</td>`;
-        tbody.appendChild(tr);
-      }
-    }
-
-    function renderSectors(tbody, sectors){
+    function renderSectorsTable(tbody, sectors){
       tbody.innerHTML = "";
       sectors.forEach(s => {
         const dir = Number(s.avg_dir_rfactor)||0;
@@ -483,16 +780,114 @@
         tr.innerHTML = `
           <td><span class="sym">${s.sector || "—"}</span></td>
           <td class="muted">${s.count ?? "—"}</td>
-          <td class="rf ${dir>=0 ? "pos":"neg"}">${n2(s.avg_dir_rfactor)}</td>
+          <td class="rf ${dir>=0 ? "pos":"neg"}">${n2(dir)}</td>
           <td class="rf">${n2(s.avg_abs_rfactor)}</td>
         `;
         tbody.appendChild(tr);
       });
+
       if (!sectors.length){
         const tr = document.createElement("tr");
         tr.innerHTML = `<td colspan="4" class="muted" style="padding:14px">No sectors</td>`;
         tbody.appendChild(tr);
       }
+    }
+
+    function setTooltip(show, x, y, sector, value){
+      if (!show){
+        els.sectorTooltip.style.display = "none";
+        return;
+      }
+      els.ttTitle.textContent = sector || "—";
+      const v = Number(value) || 0;
+      els.ttValue.textContent = `${v.toFixed(2)} ×`;
+      els.ttDot.classList.toggle("down", v < 0);
+
+      els.sectorTooltip.style.display = "block";
+      const pad = 12;
+      const rect = els.sectorTooltip.getBoundingClientRect();
+      let left = x + pad;
+      let top = y + pad;
+      if (left + rect.width > window.innerWidth - 8) left = x - rect.width - pad;
+      if (top + rect.height > window.innerHeight - 8) top = y - rect.height - pad;
+      els.sectorTooltip.style.left = `${left}px`;
+      els.sectorTooltip.style.top = `${top}px`;
+    }
+
+    function renderSectorChart(sectors){
+      const chart = els.sectorChart;
+      const yAxis = els.sectorYAxis;
+
+      chart.innerHTML = "";
+      yAxis.innerHTML = "";
+
+      // FIXED axis clamp
+      const AXIS_MAX = 10;
+
+      if (!sectors || !sectors.length){
+        const zl = document.createElement("div");
+        zl.className = "gridLine zeroLine";
+        zl.style.top = "50%";
+        chart.appendChild(zl);
+        return;
+      }
+
+      // Fixed gridlines at +10, +5, 0, -5, -10
+      const ticks = [AXIS_MAX, AXIS_MAX/2, 0, -AXIS_MAX/2, -AXIS_MAX];
+      ticks.forEach(t => {
+        const y = 50 - (t/AXIS_MAX) * 50;
+
+        const gl = document.createElement("div");
+        gl.className = "gridLine" + (t === 0 ? " zeroLine" : "");
+        gl.style.top = `${y}%`;
+        chart.appendChild(gl);
+
+        const yt = document.createElement("div");
+        yt.className = "yTick";
+        yt.style.top = `${y}%`;
+        yt.textContent = String("");
+        yAxis.appendChild(yt);
+      });
+
+      const bars = document.createElement("div");
+      bars.className = "bars";
+      chart.appendChild(bars);
+
+      sectors.forEach(s => {
+        const vRaw = Number(s.avg_dir_rfactor) || 0;
+        const v = Math.max(-AXIS_MAX, Math.min(AXIS_MAX, vRaw)); // clamp for drawing
+        const sector = s.sector || "—";
+
+        const col = document.createElement("div");
+        col.className = "col";
+
+        const mag = Math.abs(v) / AXIS_MAX;
+
+        // taller pipes: allow bars to use more vertical space
+        const maxHalf = 100; // % of chart height above/below baseline
+        const h = Math.max(3.5, mag * maxHalf);
+
+        const bar = document.createElement("div");
+        bar.className = "pillBar " + (v >= 0 ? "up" : "down");
+        bar.style.height = `${h}%`;
+
+        // baseline is 50%
+        if (v >= 0) bar.style.bottom = "50%";
+        else bar.style.top = "50%";
+
+        const label = document.createElement("div");
+        label.className = "xLabel";
+        label.textContent = sector;
+
+        col.appendChild(bar);
+        col.appendChild(label);
+
+        // Tooltip shows REAL value (unclamped)
+        col.addEventListener("mousemove", (e) => setTooltip(true, e.clientX, e.clientY, sector, vRaw));
+        col.addEventListener("mouseleave", () => setTooltip(false));
+
+        bars.appendChild(col);
+      });
     }
 
     function renderStats(snap){
@@ -518,14 +913,13 @@
       els.noteText.textContent = snap.note || "—";
       els.missingText.textContent = (snap.missing_symbols || []).join(", ") || "—";
 
-      const tc = snap.tick_count ?? 0;
-      const tps = snap.ticks_per_sec_inst ?? snap.ticks_per_sec_avg ?? null;
-      els.tickText.textContent = `Ticks ${tc} • ${tps === null ? "—" : Number(tps).toFixed(3)}/s`;
-
       const topMover = (snap.movers || [])[0];
       if (topMover){
         els.topMoverBadge.textContent = sideLabel(topMover.pct);
-        els.topMoverSym.textContent = topMover.symbol || "—";
+        const sym = topMover.symbol || "—";
+        els.topMoverSym.innerHTML =
+          `<a class="sym symLink" href="${tvUrl(sym)}" target="_blank" rel="noopener noreferrer">${sym}</a>`;
+
         els.topMoverPct.textContent = n2(topMover.pct);
         els.topMoverPct.className = "v " + signClass(topMover.pct);
         els.topMoverRf.textContent = n2(topMover.rfactor);
@@ -572,7 +966,7 @@
       return Date.UTC(Y, M-1, D, h, m, sec) - IST_OFFSET_MS;
     }
 
-    let lastSnap = {gainers:[], losers:[], movers:[], sectors:[], market:{}};
+    let lastSnap = {gainers:[], losers:[], sectors:[], market:{}, movers:[]};
 
     function updateHeaderClock(){
       const now = new Date();
@@ -581,6 +975,7 @@
       const mkt = (lastSnap && lastSnap.market) ? lastSnap.market : null;
       if (!mkt || !mkt.open || !mkt.close){
         els.sessionText.textContent = "• Session —";
+        updateTickLive();
         return;
       }
 
@@ -591,6 +986,7 @@
 
       if (openUtc === null || closeUtc === null){
         els.sessionText.textContent = `• ${state} • ${hhmm}`;
+        updateTickLive();
         return;
       }
 
@@ -601,6 +997,8 @@
       } else {
         els.sessionText.textContent = `• CLOSED • ${hhmm} • Opens in ${fmtHMS(openUtc - Date.now())}`;
       }
+
+      updateTickLive();
     }
 
     function renderAll(snap){
@@ -613,15 +1011,17 @@
 
       const gainers = applyFilters(snap.gainers || [], sector, query).slice(0,10);
       const losers  = applyFilters(snap.losers  || [], sector, query).slice(0,10);
-      const movers  = applyFilters(snap.movers  || [], sector, query).slice(0,10);
 
+      // Sector ranking: filter by selected sector; sort by avg_dir_rfactor desc
       let sectors = snap.sectors || [];
       sectors = sector ? sectors.filter(s => s.sector === sector) : sectors;
+      sectors = sectors.slice().sort((a,b) => (Number(b.avg_dir_rfactor)||0) - (Number(a.avg_dir_rfactor)||0));
 
       renderList(els.gainersBody, gainers, "gainers");
       renderList(els.losersBody,  losers,  "losers");
-      renderMovers(els.moversBody, movers);
-      renderSectors(els.sectorsBody, sectors);
+
+      renderSectorsTable(els.sectorsBody, sectors);
+      renderSectorChart(sectors);
     }
 
     function setPolling(sec){
@@ -638,7 +1038,12 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const snap = await res.json();
 
-        // Status label based on cache state
+        // tick state (for per-second UI update)
+        lastTickCount = snap.tick_count ?? 0;
+        lastTickRate  = (snap.ticks_per_sec_inst ?? snap.ticks_per_sec_avg ?? 0);
+        lastTickRecvMs = Date.now();
+        updateTickLive();
+
         const cs = snap.cache_status || "";
         if (cs === "SEEDING" || cs === "BOOTSTRAP") setStatus(true, cs);
         else setStatus(true, "LIVE");
@@ -650,7 +1055,6 @@
           setPolling(backendSec);
         }
       } catch(e){
-        // Backend not reachable (or restarting)
         setStatus(false, "WAITING");
         els.noteBadge.textContent = "WAITING FOR BACKEND…";
         els.noteText.textContent = "Waiting for application startup / seeding…";
