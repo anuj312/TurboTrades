@@ -322,7 +322,7 @@
 
     .yAxis{
       position: relative;
-      height: 460px; /* taller */
+      height: 460px;
       border-right: 1px solid rgba(255,255,255,.10);
     }
     .yTick{
@@ -348,7 +348,7 @@
 
     .chart{
       position: relative;
-      height: 560px; /* taller */
+      height: 560px;
       min-width: 980px;
       border-radius: 14px;
       background:
@@ -537,7 +537,6 @@
       </div>
     </div>
 
-    <!-- Gainers + Losers -->
     <div class="grid2">
       <div class="card">
         <div class="cardHead">
@@ -566,7 +565,6 @@
       </div>
     </div>
 
-    <!-- Sector Ranking (FULL WIDTH) -->
     <div class="card" style="margin-top:16px">
       <div class="cardHead">
         <div class="cardTitle">Sector ranking</div>
@@ -610,10 +608,9 @@
     let pollHandle = null;
     let pollSec = 15;
 
-    // tick interpolation (UI updates every second, even if snapshot polls slower)
     let lastTickCount = 0;
-    let lastTickRate = 0;      // ticks/sec
-    let lastTickRecvMs = 0;    // when snapshot arrived
+    let lastTickRate = 0;
+    let lastTickRecvMs = 0;
 
     const $ = (id) => document.getElementById(id);
     const els = {
@@ -697,7 +694,7 @@
       }
 
       const dtSec = Math.max(0, (Date.now() - lastTickRecvMs) / 1000);
-      const est = Math.max(0, Math.floor(base + dtSec * rate));  // estimated total ticks
+      const est = Math.max(0, Math.floor(base + dtSec * rate));
 
       const rateText = rate ? rate.toFixed(3) : "—";
       els.tickText.textContent = `Ticks ${est} total • ${rateText}/s`;
@@ -744,8 +741,6 @@
 
       rows.forEach(r => {
         const w = boostWidth(r.rfactor, maxRf);
-
-        // DirR = sign(pct) * rfactor
         const pct = Number(r.pct) || 0;
         const rf = Number(r.rfactor) || 0;
         const dirR = (pct >= 0 ? 1 : -1) * rf;
@@ -821,18 +816,20 @@
       chart.innerHTML = "";
       yAxis.innerHTML = "";
 
-      // FIXED axis clamp
       const AXIS_MAX = 10;
 
-      if (!sectors || !sectors.length){
+      const addZeroOnly = () => {
         const zl = document.createElement("div");
         zl.className = "gridLine zeroLine";
         zl.style.top = "50%";
         chart.appendChild(zl);
+      };
+
+      if (!sectors || !sectors.length){
+        addZeroOnly();
         return;
       }
 
-      // Fixed gridlines at +10, +5, 0, -5, -10
       const ticks = [AXIS_MAX, AXIS_MAX/2, 0, -AXIS_MAX/2, -AXIS_MAX];
       ticks.forEach(t => {
         const y = 50 - (t/AXIS_MAX) * 50;
@@ -845,7 +842,7 @@
         const yt = document.createElement("div");
         yt.className = "yTick";
         yt.style.top = `${y}%`;
-        yt.textContent = String("");
+        yt.textContent = (t > 0 ? `+${t}` : `${t}`);
         yAxis.appendChild(yt);
       });
 
@@ -855,23 +852,19 @@
 
       sectors.forEach(s => {
         const vRaw = Number(s.avg_dir_rfactor) || 0;
-        const v = Math.max(-AXIS_MAX, Math.min(AXIS_MAX, vRaw)); // clamp for drawing
+        const v = Math.max(-AXIS_MAX, Math.min(AXIS_MAX, vRaw));
         const sector = s.sector || "—";
 
         const col = document.createElement("div");
         col.className = "col";
 
         const mag = Math.abs(v) / AXIS_MAX;
-
-        // taller pipes: allow bars to use more vertical space
-        const maxHalf = 100; // % of chart height above/below baseline
-        const h = Math.max(3.5, mag * maxHalf);
+        const h = Math.max(3.5, mag * 100);
 
         const bar = document.createElement("div");
         bar.className = "pillBar " + (v >= 0 ? "up" : "down");
         bar.style.height = `${h}%`;
 
-        // baseline is 50%
         if (v >= 0) bar.style.bottom = "50%";
         else bar.style.top = "50%";
 
@@ -882,7 +875,6 @@
         col.appendChild(bar);
         col.appendChild(label);
 
-        // Tooltip shows REAL value (unclamped)
         col.addEventListener("mousemove", (e) => setTooltip(true, e.clientX, e.clientY, sector, vRaw));
         col.addEventListener("mouseleave", () => setTooltip(false));
 
@@ -945,7 +937,6 @@
       }
     }
 
-    // --- Header clock + session countdown (updates every second) ---
     function fmtHMS(ms){
       ms = Math.max(0, ms);
       const s = Math.floor(ms/1000);
@@ -957,7 +948,6 @@
     }
 
     function parseISTDatetimeToUtcMs(s){
-      // "YYYY-MM-DD HH:MM:SS" in IST -> UTC ms (IST fixed offset)
       if (!s) return null;
       const parts = s.trim().split(" ");
       if (parts.length !== 2) return null;
@@ -1012,14 +1002,12 @@
       const gainers = applyFilters(snap.gainers || [], sector, query).slice(0,10);
       const losers  = applyFilters(snap.losers  || [], sector, query).slice(0,10);
 
-      // Sector ranking: filter by selected sector; sort by avg_dir_rfactor desc
       let sectors = snap.sectors || [];
       sectors = sector ? sectors.filter(s => s.sector === sector) : sectors;
       sectors = sectors.slice().sort((a,b) => (Number(b.avg_dir_rfactor)||0) - (Number(a.avg_dir_rfactor)||0));
 
       renderList(els.gainersBody, gainers, "gainers");
       renderList(els.losersBody,  losers,  "losers");
-
       renderSectorsTable(els.sectorsBody, sectors);
       renderSectorChart(sectors);
     }
@@ -1035,10 +1023,19 @@
     async function loadSnapshot(){
       try{
         const res = await fetch(`/api/snapshot?t=${Date.now()}`, {cache:"no-store"});
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const ct = (res.headers.get("content-type") || "").toLowerCase();
+
+        if (!res.ok){
+          const txt = await res.text();
+          throw new Error(`HTTP ${res.status}: ${txt.slice(0,180)}`);
+        }
+        if (!ct.includes("application/json")){
+          const txt = await res.text();
+          throw new Error(`Non-JSON response: ${txt.slice(0,180)}`);
+        }
+
         const snap = await res.json();
 
-        // tick state (for per-second UI update)
         lastTickCount = snap.tick_count ?? 0;
         lastTickRate  = (snap.ticks_per_sec_inst ?? snap.ticks_per_sec_avg ?? 0);
         lastTickRecvMs = Date.now();
@@ -1057,7 +1054,7 @@
       } catch(e){
         setStatus(false, "WAITING");
         els.noteBadge.textContent = "WAITING FOR BACKEND…";
-        els.noteText.textContent = "Waiting for application startup / seeding…";
+        els.noteText.textContent = String(e && e.message ? e.message : e);
       }
     }
 
@@ -1065,7 +1062,6 @@
     els.sectorFilter.addEventListener("change", () => renderAll(lastSnap));
     els.search.addEventListener("input", () => renderAll(lastSnap));
 
-    // start
     loadSnapshot().then(() => setPolling(15));
     setInterval(updateHeaderClock, 1000);
     updateHeaderClock();

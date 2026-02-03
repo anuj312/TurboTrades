@@ -1,15 +1,27 @@
 import os
 import time
 import asyncio
+import random
+import logging
 from datetime import datetime, timedelta, date, time as dtime
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Callable, TypeVar
 
 import pytz
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, FileResponse
 from kiteconnect import KiteConnect
+from kiteconnect.exceptions import NetworkException, DataException
+
+# ---------------------------
+# LOGGING (Render-friendly)
+# ---------------------------
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+log = logging.getLogger("intraday-boost")
 
 # ---------------------------
 #  ONLY YOUR SECTORS/STOCKS
@@ -51,7 +63,13 @@ IST = pytz.timezone("Asia/Kolkata")
 
 LOOKBACK_SESSIONS = int(os.getenv("LOOKBACK_SESSIONS", "20"))
 REFRESH_EVERY_SEC = int(os.getenv("REFRESH_EVERY_SEC", "15"))
-QUOTE_CHUNK_SIZE = int(os.getenv("QUOTE_CHUNK_SIZE", "150"))
+QUOTE_CHUNK_SIZE = int(os.getenv("QUOTE_CHUNK_SIZE", "120"))  # safer than 150 under load
+KITE_TIMEOUT_SEC = int(os.getenv("KITE_TIMEOUT_SEC", "15"))
+
+# Retry tuning (important for 504 HTML responses)
+KITE_RETRIES = int(os.getenv("KITE_RETRIES", "4"))
+KITE_RETRY_BASE_SLEEP = float(os.getenv("KITE_RETRY_BASE_SLEEP", "0.5"))
+QUOTE_CHUNK_SLEEP = float(os.getenv("QUOTE_CHUNK_SLEEP", "0.18"))  # gentler, reduces 504 risk
 
 KITE_API_KEY = os.getenv("KITE_API_KEY")
 KITE_ACCESS_TOKEN = os.getenv("KITE_ACCESS_TOKEN")
@@ -138,8 +156,35 @@ def build_sym_to_sectors(sector_defs: dict) -> Dict[str, List[str]]:
 def chunked(lst: List[str], n: int) -> List[List[str]]:
     return [lst[i:i+n] for i in range(0, len(lst), n)]
 
+T = TypeVar("T")
+
+def kite_retry(fn: Callable[..., T], *args, **kwargs) -> T:
+    """
+    Retry Kite API calls that often fail with transient 504/HTML responses.
+    """
+    last_exc: Optional[Exception] = None
+    for i in range(KITE_RETRIES):
+        try:
+            return fn(*args, **kwargs)
+        except (NetworkException, DataException) as e:
+            last_exc = e
+            sleep_s = KITE_RETRY_BASE_SLEEP * (2 ** i) + random.random() * 0.2
+            log.warning("Kite call failed (%s). retry %d/%d, sleep=%.2fs",
+                        repr(e), i + 1, KITE_RETRIES, sleep_s)
+            time.sleep(sleep_s)
+        except Exception as e:
+            # Unknown error: still retry a bit, because sometimes HTML errors show as generic
+            last_exc = e
+            sleep_s = KITE_RETRY_BASE_SLEEP * (2 ** i) + random.random() * 0.2
+            log.warning("Kite call unexpected error (%s). retry %d/%d, sleep=%.2fs",
+                        repr(e), i + 1, KITE_RETRIES, sleep_s)
+            time.sleep(sleep_s)
+
+    assert last_exc is not None
+    raise last_exc
+
 def load_instrument_map(k: KiteConnect, exchange: str = "NSE") -> Dict[str, int]:
-    inst = k.instruments(exchange)
+    inst = kite_retry(k.instruments, exchange)
     return {row["tradingsymbol"]: row["instrument_token"] for row in inst}
 
 # ---- Market session helpers (Mon–Fri only; no holiday calendar) ----
@@ -231,7 +276,7 @@ def set_snapshot(note: str, **fields):
     mkt = market_status(now_ist())
     base = {
         "timestamp": now_ist_str(),
-        "universe_count": 0,
+        "universe_count": len(symbols),
         "gainers": [],
         "losers": [],
         "movers": [],
@@ -244,20 +289,33 @@ def set_snapshot(note: str, **fields):
 
 # ---- Stats & scoring ----
 def get_20d_stats(k: KiteConnect, token: int, asof: date) -> Dict[str, Optional[float]]:
+    """
+    Computes 20-session averages using daily candles.
+    Caches result in stats_by_token. On failure, caches None stats
+    to avoid repeated historical-data calls.
+    """
     if token in stats_by_token:
         return stats_by_token[token]
 
     to_dt = datetime.combine(asof - timedelta(days=1), datetime.min.time())
     from_dt = to_dt - timedelta(days=90)
 
-    candles = k.historical_data(
-        instrument_token=token,
-        from_date=from_dt,
-        to_date=to_dt,
-        interval="day",
-        continuous=False,
-        oi=False
-    )
+    try:
+        candles = kite_retry(
+            k.historical_data,
+            instrument_token=token,
+            from_date=from_dt,
+            to_date=to_dt,
+            interval="day",
+            continuous=False,
+            oi=False
+        )
+    except Exception as e:
+        st = {"avg_vol_20": None, "avg_range_20": None, "avg_abs_ret_20": None}
+        stats_by_token[token] = st
+        log.warning("historical_data failed token=%s err=%s", token, repr(e))
+        return st
+
     df = pd.DataFrame(candles)
     if df.empty or len(df) < LOOKBACK_SESSIONS + 1:
         st = {"avg_vol_20": None, "avg_range_20": None, "avg_abs_ret_20": None}
@@ -329,11 +387,25 @@ def sector_rankings(df: pd.DataFrame) -> pd.DataFrame:
     return sdf
 
 def _fetch_quotes_sync(k: KiteConnect, syms: List[str]) -> Dict[str, dict]:
+    """
+    Fetch quotes in chunks with retries.
+    If one chunk fails after retries, continue with remaining chunks
+    (partial snapshot is better than none).
+    """
     quotes: Dict[str, dict] = {}
-    for part in chunked(syms, QUOTE_CHUNK_SIZE):
+    parts = chunked(syms, QUOTE_CHUNK_SIZE)
+
+    for idx, part in enumerate(parts, 1):
         instruments = [f"NSE:{s}" for s in part]
-        quotes.update(k.quote(instruments))
-        time.sleep(0.12)
+        try:
+            q = kite_retry(k.quote, instruments)
+            if isinstance(q, dict):
+                quotes.update(q)
+        except Exception as e:
+            log.warning("quote chunk failed idx=%d/%d size=%d err=%s",
+                        idx, len(parts), len(part), repr(e))
+        time.sleep(QUOTE_CHUNK_SLEEP)
+
     return quotes
 
 def _build_df_sync(k: KiteConnect, syms: List[str]) -> pd.DataFrame:
@@ -345,13 +417,20 @@ def _build_df_sync(k: KiteConnect, syms: List[str]) -> pd.DataFrame:
         q = quotes.get(f"NSE:{sym}")
         if not q:
             continue
+
         token = symbol_to_token.get(sym)
         if not token:
             continue
-        st = stats_by_token.get(token) or get_20d_stats(k, token, asof)
+
+        st = stats_by_token.get(token)
+        if st is None:
+            # Safety: in case seeding didn't fill it, do one attempt (cached either way).
+            st = get_20d_stats(k, token, asof)
+
         r = compute_rfactor(q, st)
         if r["rfactor"] is None or r["pct"] is None:
             continue
+
         rows.append({
             "symbol": sym,
             "pct": r["pct"],
@@ -383,7 +462,7 @@ def build_snapshot(df: pd.DataFrame) -> Dict[str, Any]:
 
     return {
         "timestamp": now_ist_str(),
-        "universe_count": int(len(df)),
+        "universe_count": len(symbols),     # total universe
         "gainers": rows(gainers),
         "losers": rows(losers),
         "movers": rows(movers),
@@ -418,7 +497,7 @@ def _tick_update():
 # BACKGROUND TASKS
 # ---------------------------
 async def seed_cache_task(k: KiteConnect, syms: List[str]):
-    global cache_total, cache_done, cache_status, cache_current_symbol, seeding_task, scanner_task
+    global cache_total, cache_done, cache_status, cache_current_symbol, scanner_task
 
     asof = now_ist().date()
     cache_total = len(syms)
@@ -431,22 +510,26 @@ async def seed_cache_task(k: KiteConnect, syms: List[str]):
     for i, s in enumerate(syms, 1):
         cache_current_symbol = s
         token = symbol_to_token.get(s)
+
         try:
             if token:
                 await asyncio.to_thread(get_20d_stats, k, token, asof)
-        except Exception:
-            pass
+        except Exception as e:
+            # Cache a placeholder to avoid repeated historical hits later
+            if token:
+                stats_by_token[token] = {"avg_vol_20": None, "avg_range_20": None, "avg_abs_ret_20": None}
+            log.warning("seed_cache failed sym=%s err=%s", s, repr(e))
 
         cache_done = i
         set_snapshot(f"Seeding 20D cache… {cache_done}/{cache_total} ({cache_current_symbol})")
 
-        await asyncio.sleep(0.35)  # rate-limit friendly
+        # Friendly rate limit
+        await asyncio.sleep(0.35)
 
     cache_current_symbol = None
     cache_status = "READY"
     set_snapshot("Cache ready. Starting scanner…")
 
-    # start live scanner after seeding
     scanner_task = asyncio.create_task(scanner_loop())
 
 async def scanner_loop():
@@ -463,12 +546,11 @@ async def scanner_loop():
                 continue
 
             if cache_status != "READY":
-                # seeding task already updates snapshot frequently; keep it stable here
                 await asyncio.sleep(1)
                 continue
 
             if not mkt["is_open"]:
-                # keep last computed lists (if any), but update meta & note
+                # Keep last lists, only update meta/note
                 last_snapshot = {
                     **last_snapshot,
                     "timestamp": now_ist_str(),
@@ -483,23 +565,22 @@ async def scanner_loop():
 
             if df.empty:
                 last_snapshot = {
+                    **last_snapshot,
                     "timestamp": now_ist_str(),
-                    "universe_count": 0,
-                    "gainers": [], "losers": [], "movers": [], "sectors": [],
                     **_snapshot_meta(mkt),
-                    "note": "No live rows. Check symbol mapping / market data.",
+                    "note": "No live rows (quotes missing or stats unavailable).",
                 }
             else:
                 snap = build_snapshot(df)
                 last_snapshot = {**snap, **_snapshot_meta(mkt)}
 
         except Exception as e:
+            # IMPORTANT: do not wipe lists; keep last good snapshot
             last_snapshot = {
+                **last_snapshot,
                 "timestamp": now_ist_str(),
-                "universe_count": 0,
-                "gainers": [], "losers": [], "movers": [], "sectors": [],
                 **_snapshot_meta(mkt),
-                "note": f"Error: {repr(e)}",
+                "note": f"Transient error: {repr(e)}",
             }
 
         await asyncio.sleep(REFRESH_EVERY_SEC)
@@ -509,7 +590,7 @@ async def bootstrap():
     Runs after server is already up, so UI can show progress.
     """
     global kite, symbols, missing_symbols, symbol_to_token
-    global cache_status, bootstrap_task, seeding_task
+    global cache_status, seeding_task
 
     cache_status = "BOOTSTRAP"
     set_snapshot("Bootstrapping…")
@@ -523,7 +604,7 @@ async def bootstrap():
         return
 
     try:
-        kite_local = KiteConnect(api_key=KITE_API_KEY)
+        kite_local = KiteConnect(api_key=KITE_API_KEY, timeout=KITE_TIMEOUT_SEC)
         kite_local.set_access_token(KITE_ACCESS_TOKEN)
         kite = kite_local
 
@@ -540,8 +621,8 @@ async def bootstrap():
                 missing_symbols.append(s)
 
         symbols = [s for s in all_syms if s in symbol_to_token]
+        set_snapshot(f"Bootstrap OK. Symbols={len(symbols)} Missing={len(missing_symbols)}. Starting seeding…")
 
-        # Start seeding in background (does NOT block server)
         seeding_task = asyncio.create_task(seed_cache_task(kite, symbols))
 
     except Exception as e:
@@ -559,6 +640,7 @@ def index():
 
 @app.get("/api/snapshot")
 def api_snapshot():
+    # Always return JSON quickly (Render proxy friendly)
     return JSONResponse(last_snapshot)
 
 @app.get("/health")
@@ -587,7 +669,6 @@ def health():
 @app.on_event("startup")
 async def on_startup():
     global bootstrap_task
-    # Server becomes available immediately; bootstrap runs in background.
     set_snapshot("Waiting for backend bootstrap…")
     bootstrap_task = asyncio.create_task(bootstrap())
 
