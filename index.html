@@ -378,6 +378,12 @@
       padding: 14px 16px 12px;
     }
 
+    .tableScroll{
+  max-height: 420px;          /* adjust as you like */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
     .col{
       width: 56px;
       flex: 0 0 auto;
@@ -596,7 +602,7 @@
           <div class="cardTitle">Top 10 Gainers <span class="muted">(by RFactor)</span></div>
           <div class="badge">LIVE</div>
         </div>
-        <div style="overflow:auto">
+        <div class="tableScroll">
           <table>
             <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th>DirR</th></tr></thead>
             <tbody id="gainersBody"></tbody>
@@ -609,7 +615,7 @@
           <div class="cardTitle">Top 10 Losers <span class="muted">(by RFactor)</span></div>
           <div class="badge">LIVE</div>
         </div>
-        <div style="overflow:auto">
+        <div class="tableScroll">
           <table>
             <thead><tr><th>Symbol</th><th>%</th><th>RFactor</th><th>Boost</th><th>DirR</th></tr></thead>
             <tbody id="losersBody"></tbody>
@@ -1184,8 +1190,8 @@ if (badge) badge.textContent = `Histogram • DirRFactor • ${axisText} • Cli
       const sector = els.sectorFilter.value;
       const query  = els.search.value;
 
-      const gainers = applyFilters(snap.gainers || [], sector, query).slice(0,10);
-      const losers  = applyFilters(snap.losers  || [], sector, query).slice(0,10);
+      const gainers = applyFilters(snap.gainers || [], sector, query).slice(0,20);
+      const losers  = applyFilters(snap.losers  || [], sector, query).slice(0,20);
 
       let sectors = snap.sectors || [];
       sectors = sector ? sectors.filter(s => s.sector === sector) : sectors;

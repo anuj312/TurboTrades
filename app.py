@@ -438,8 +438,9 @@ def _build_df_sync(k: KiteConnect, syms: List[str]) -> pd.DataFrame:
     return df.dropna(subset=["rfactor", "pct"])
 
 def build_snapshot(df: pd.DataFrame) -> Dict[str, Any]:
-    gainers = df[df["pct"] > 0].sort_values("rfactor", ascending=False).head(10)
-    losers  = df[df["pct"] < 0].sort_values("rfactor", ascending=False).head(10)
+    TOP_N = 20
+    gainers = df[df["pct"] > 0].sort_values("rfactor", ascending=False).head(TOP_N)
+    losers  = df[df["pct"] < 0].sort_values("rfactor", ascending=False).head(TOP_N)
     movers  = df.assign(abs_r=df["rfactor"].abs()).sort_values("abs_r", ascending=False).head(10)
     sdf = sector_rankings(df)
 
