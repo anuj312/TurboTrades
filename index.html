@@ -307,7 +307,7 @@
       background: linear-gradient(90deg, rgba(251,113,133,.95), rgba(251,113,133,.65));
     }
 
-    /* -------- Sector Histogram (fixed axis -10..+10) -------- */
+    /* -------- Sector Histogram -------- */
     .sectorChartWrap{
       padding: 12px 14px 6px;
       border-bottom: 1px solid rgba(255,255,255,.06);
@@ -320,9 +320,10 @@
       align-items: stretch;
     }
 
+    /* match chart height */
     .yAxis{
       position: relative;
-      height: 460px;
+      height: 560px;
       border-right: 1px solid rgba(255,255,255,.10);
     }
     .yTick{
@@ -356,6 +357,7 @@
         radial-gradient(520px 220px at 92% 20%, rgba(34,211,238,.08), transparent 60%),
         rgba(255,255,255,.02);
       border: 1px solid rgba(255,255,255,.08);
+      overflow: hidden; /* important */
     }
 
     .gridLine{
@@ -365,9 +367,7 @@
       background: rgba(255,255,255,.08);
       pointer-events:none;
     }
-    .zeroLine{
-      background: rgba(255,255,255,.14);
-    }
+    .zeroLine{ background: rgba(255,255,255,.14); }
 
     .bars{
       position:absolute;
@@ -386,7 +386,7 @@
       display:flex;
       align-items: stretch;
       justify-content:center;
-      cursor: default;
+      cursor: pointer; /* clickable */
     }
 
     .pillBar{
@@ -462,6 +462,59 @@
     .ttDot.down{
       background: #FB7185;
       box-shadow: 0 0 0 4px rgba(251,113,133,.18);
+    }
+
+    /* ----- Sector drilldown modal ----- */
+    .modalOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 18px;
+    }
+
+    .modal{
+      width: min(980px, 96vw);
+      max-height: min(78vh, 820px);
+      overflow: hidden;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 24px 80px rgba(0,0,0,.60);
+    }
+
+    .modalHead{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .modalTitle{
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+
+    .iconBtn{
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 900;
+    }
+
+    .modalBody{
+      overflow: auto;
+      max-height: calc(78vh - 56px);
     }
 
     @media (max-width: 1100px){ .grid2{ grid-template-columns: 1fr; } }
@@ -568,7 +621,9 @@
     <div class="card" style="margin-top:16px">
       <div class="cardHead">
         <div class="cardTitle">Sector ranking</div>
-        <div class="badge">Histogram • DirRFactor • Axis -10…+10</div>
+        <div class="badge" id="sectorAxisBadge">
+  Histogram • DirRFactor • Axis — • Click a bar to open sector stocks
+</div>
       </div>
 
       <div class="sectorChartWrap">
@@ -595,6 +650,33 @@
     </div>
   </div>
 
+  <!-- Sector modal -->
+  <div class="modalOverlay" id="sectorModalOverlay">
+    <div class="modal">
+      <div class="modalHead">
+        <div>
+          <div class="modalTitle" id="sectorModalTitle">Sector —</div>
+          <div class="muted" id="sectorModalSub">Sorted by RFactor (desc)</div>
+        </div>
+        <button class="iconBtn" id="sectorModalClose">Close</button>
+      </div>
+
+      <div class="modalBody">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>%</th>
+              <th>RFactor</th>
+            </tr>
+          </thead>
+          <tbody id="sectorStocksBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tooltip -->
   <div class="chartTooltip" id="sectorTooltip">
     <div class="ttTitle" id="ttTitle">—</div>
     <div class="ttRow">
@@ -658,6 +740,12 @@
       ttTitle: $("ttTitle"),
       ttDot: $("ttDot"),
       ttValue: $("ttValue"),
+
+      sectorModalOverlay: $("sectorModalOverlay"),
+      sectorModalTitle: $("sectorModalTitle"),
+      sectorModalSub: $("sectorModalSub"),
+      sectorModalClose: $("sectorModalClose"),
+      sectorStocksBody: $("sectorStocksBody"),
     };
 
     const fmtIST_HMS = new Intl.DateTimeFormat("en-IN", {
@@ -809,78 +897,175 @@
       els.sectorTooltip.style.top = `${top}px`;
     }
 
-    function renderSectorChart(sectors){
-      const chart = els.sectorChart;
-      const yAxis = els.sectorYAxis;
-
-      chart.innerHTML = "";
-      yAxis.innerHTML = "";
-
-      const AXIS_MAX = 10;
-
-      const addZeroOnly = () => {
-        const zl = document.createElement("div");
-        zl.className = "gridLine zeroLine";
-        zl.style.top = "50%";
-        chart.appendChild(zl);
-      };
-
-      if (!sectors || !sectors.length){
-        addZeroOnly();
-        return;
-      }
-
-      const ticks = [AXIS_MAX, AXIS_MAX/2, 0, -AXIS_MAX/2, -AXIS_MAX];
-      ticks.forEach(t => {
-        const y = 50 - (t/AXIS_MAX) * 50;
-
-        const gl = document.createElement("div");
-        gl.className = "gridLine" + (t === 0 ? " zeroLine" : "");
-        gl.style.top = `${y}%`;
-        chart.appendChild(gl);
-
-        const yt = document.createElement("div");
-        yt.className = "yTick";
-        yt.style.top = `${y}%`;
-        yt.textContent = (t > 0 ? `+${t}` : `${t}`);
-        yAxis.appendChild(yt);
-      });
-
-      const bars = document.createElement("div");
-      bars.className = "bars";
-      chart.appendChild(bars);
-
-      sectors.forEach(s => {
-        const vRaw = Number(s.avg_dir_rfactor) || 0;
-        const v = Math.max(-AXIS_MAX, Math.min(AXIS_MAX, vRaw));
-        const sector = s.sector || "—";
-
-        const col = document.createElement("div");
-        col.className = "col";
-
-        const mag = Math.abs(v) / AXIS_MAX;
-        const h = Math.max(3.5, mag * 100);
-
-        const bar = document.createElement("div");
-        bar.className = "pillBar " + (v >= 0 ? "up" : "down");
-        bar.style.height = `${h}%`;
-
-        if (v >= 0) bar.style.bottom = "50%";
-        else bar.style.top = "50%";
-
-        const label = document.createElement("div");
-        label.className = "xLabel";
-        label.textContent = sector;
-
-        col.appendChild(bar);
-        col.appendChild(label);
-
-        col.addEventListener("mousemove", (e) => setTooltip(true, e.clientX, e.clientY, sector, vRaw));
-        col.addEventListener("mouseleave", () => setTooltip(false));
-
-        bars.appendChild(col);
-      });
+    function showSectorModal(show){
+      els.sectorModalOverlay.style.display = show ? "flex" : "none";
     }
+
+    function renderSectorStocks(rows){
+      const tb = els.sectorStocksBody;
+      tb.innerHTML = "";
+
+      (rows || []).forEach(r => {
+        const pct = Number(r.pct) || 0;
+        const rf = Number(r.rfactor) || 0;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <a class="sym symLink" href="${tvUrl(r.symbol)}" target="_blank" rel="noopener noreferrer">
+              ${r.symbol || "—"}
+            </a>
+          </td>
+          <td class="${signClass(pct)}">${n2(pct)}</td>
+          <td class="rf">${n2(rf)}</td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      if (!rows || !rows.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3" class="muted" style="padding:14px">No rows</td>`;
+        tb.appendChild(tr);
+      }
+    }
+
+    async function openSectorStocks(sector){
+      if (!sector) return;
+
+      els.sectorModalTitle.textContent = `Sector: ${sector}`;
+      els.sectorModalSub.textContent = `Loading… (sorted by RFactor desc)`;
+      renderSectorStocks([]);
+      showSectorModal(true);
+
+      try{
+        const res = await fetch(`/api/sector-stocks?sector=${encodeURIComponent(sector)}&t=${Date.now()}`, {cache:"no-store"});
+        const ct = (res.headers.get("content-type") || "").toLowerCase();
+
+        if (!res.ok){
+          const txt = await res.text();
+          throw new Error(`HTTP ${res.status}: ${txt.slice(0,160)}`);
+        }
+        if (!ct.includes("application/json")){
+          const txt = await res.text();
+          throw new Error(`Non-JSON response: ${txt.slice(0,160)}`);
+        }
+
+        const data = await res.json();
+        els.sectorModalSub.textContent = `${data.count ?? (data.rows||[]).length} stocks • ${data.timestamp || ""} • Sorted by RFactor (desc)`;
+        renderSectorStocks(data.rows || []);
+      } catch(e){
+        els.sectorModalSub.textContent = `Error: ${String(e.message || e)}`;
+        renderSectorStocks([]);
+      }
+    }
+
+    function niceAxisMax(x){
+  // round up to 1/2/5/10 * 10^n
+  x = Math.abs(Number(x) || 0);
+  if (x <= 0) return 1;
+
+  const exp = Math.pow(10, Math.floor(Math.log10(x)));
+  const f = x / exp;
+
+  let nf;
+  if (f <= 1) nf = 1;
+  else if (f <= 2) nf = 2;
+  else if (f <= 5) nf = 5;
+  else nf = 10;
+
+  return nf * exp;
+}
+
+function fmtTick(v, axisMax){
+  const av = Math.abs(axisMax);
+  // show decimals only for small ranges
+  const digits = av < 2 ? 2 : (av < 10 ? 1 : 0);
+  const s = Number(v).toFixed(digits);
+  return (Number(v) > 0 ? `+${s}` : s);
+}
+
+function renderSectorChart(sectors){
+  const chart = els.sectorChart;
+  const yAxis = els.sectorYAxis;
+
+  chart.innerHTML = "";
+  yAxis.innerHTML = "";
+
+  if (!sectors || !sectors.length){
+    const zl = document.createElement("div");
+    zl.className = "gridLine zeroLine";
+    zl.style.top = "50%";
+    chart.appendChild(zl);
+    return;
+  }
+
+  // AUTO axis based on data (with small headroom so tallest bar doesn't touch edges)
+  const maxAbsRaw = Math.max(
+    ...sectors.map(s => Math.abs(Number(s.avg_dir_rfactor) || 0)),
+    1
+  );
+
+  const AXIS_MAX = niceAxisMax(maxAbsRaw * 1.08); // 8% headroom
+  const axisText = `Axis ${(-AXIS_MAX).toFixed(2)}…+${(AXIS_MAX).toFixed(2)}`;
+const badge = document.getElementById("sectorAxisBadge");
+if (badge) badge.textContent = `Histogram • DirRFactor • ${axisText} • Click a bar to open sector stocks`;
+
+  // gridlines at +max, +half, 0, -half, -max
+  const ticks = [AXIS_MAX, AXIS_MAX/2, 0, -AXIS_MAX/2, -AXIS_MAX];
+  ticks.forEach(t => {
+    const y = 50 - (t/AXIS_MAX) * 50;
+
+    const gl = document.createElement("div");
+    gl.className = "gridLine" + (t === 0 ? " zeroLine" : "");
+    gl.style.top = `${y}%`;
+    chart.appendChild(gl);
+
+    const yt = document.createElement("div");
+    yt.className = "yTick";
+    yt.style.top = `${y}%`;
+    yt.textContent = fmtTick(t, AXIS_MAX);
+    yAxis.appendChild(yt);
+  });
+
+  const bars = document.createElement("div");
+  bars.className = "bars";
+  chart.appendChild(bars);
+
+  sectors.forEach(s => {
+    const vRaw = Number(s.avg_dir_rfactor) || 0;
+    const sector = s.sector || "—";
+
+    const col = document.createElement("div");
+    col.className = "col";
+
+    // bar height must fit within 50% above/below baseline
+    const mag = Math.min(1, Math.abs(vRaw) / AXIS_MAX);
+    const h = Math.max(3.5, mag * 50); // 0..50%
+
+    const bar = document.createElement("div");
+    bar.className = "pillBar " + (vRaw >= 0 ? "up" : "down");
+    bar.style.height = `${h}%`;
+
+    if (vRaw >= 0) bar.style.bottom = "50%";
+    else bar.style.top = "50%";
+
+    const label = document.createElement("div");
+    label.className = "xLabel";
+    label.textContent = sector;
+
+    col.appendChild(bar);
+    col.appendChild(label);
+
+    // tooltip shows REAL value
+    col.addEventListener("mousemove", (e) => setTooltip(true, e.clientX, e.clientY, sector, vRaw));
+    col.addEventListener("mouseleave", () => setTooltip(false));
+
+    // click behavior (your existing)
+    col.addEventListener("click", () => openSectorStocks(sector));
+
+    bars.appendChild(col);
+  });
+}
 
     function renderStats(snap){
       els.tsText.textContent = snap.timestamp ? `• ${snap.timestamp}` : "";
@@ -1057,6 +1242,15 @@
         els.noteText.textContent = String(e && e.message ? e.message : e);
       }
     }
+
+    // Modal close handlers
+    els.sectorModalClose.addEventListener("click", () => showSectorModal(false));
+    els.sectorModalOverlay.addEventListener("click", (e) => {
+      if (e.target === els.sectorModalOverlay) showSectorModal(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") showSectorModal(false);
+    });
 
     els.refreshBtn.addEventListener("click", loadSnapshot);
     els.sectorFilter.addEventListener("change", () => renderAll(lastSnap));
