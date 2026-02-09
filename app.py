@@ -27,33 +27,33 @@ log = logging.getLogger("intraday-boost")
 # SECTORS / STOCKS
 # ---------------------------
 SECTOR_DEFINITIONS = {
-    "METAL": ["ADANIENT", "HINDALCO", "JSWSTEEL", "HINDZINC", "APLAPOLLO", "TATASTEEL", "JINDALSTEL", "VEDL", "SAIL", "NATIONALUM", "NMDC"],
-    "PSUS": ["BANKINDIA", "PNB", "INDIANB", "SBIN", "UNIONBANK", "BANKBARODA", "CANBK"],
-    "REALTY": ["PHOENIXLTD", "GODREJPROP", "LODHA", "OBEROIRLTY", "DLF", "PRESTIGE", "NBCC", "NCC"],
-    "ENERGY": ["CGPOWER", "RELIANCE", "GMRAIRPORT", "JSWENERGY", "ONGC", "POWERGRID", "BLUESTARCO", "COALINDIA", "SUZLON", "IREDA",
-               "IOC", "IGL", "TATAPOWER", "INOXWIND", "MAZDOCK", "PETRONET", "SOLARINDS", "ADANIGREEN", "NTPC", "OIL", "BDL", "BPCL",
-               "NHPC", "POWERINDIA", "ADANIENSOL", "HINDPETRO", "TORNTPOWER"],
-    "AUTO": ["BOSCHLTD", "TIINDIA", "HEROMOTOCO", "M&M", "EICHERMOT", "EXIDEIND", "BAJAJ-AUTO", "ASHOKLEY", "MARUTI", "TITAGARH",
-             "TVSMOTOR", "MOTHERSON", "SONACOMS", "UNOMINDA", "TMPV", "BHARATFORG"],
-    "IT": ["KAYNES", "TATATECH", "LTIM", "CYIENT", "MPHASIS", "TCS", "CAMS", "OFSS", "HFCL", "TECHM", "TATAELXSI", "HCLTECH", "WIPRO",
-           "KPITTECH", "COFORGE", "PERSISTENT", "INFY"],
-    "PHARMA": ["CIPLA", "ALKEM", "BIOCON", "DRREDDY", "MANKIND", "TORNTPHARM", "ZYDUSLIFE", "DIVISLAB", "LUPIN", "PPLPHARMA",
-               "LAURUSLABS", "FORTIS", "AUROPHARMA", "GLENMARK", "SUNPHARMA"],
-    "FMCG": ["ETERNAL", "MARICO", "NYKAA", "NESTLEIND", "VBL", "COLPAL", "HINDUNILVR", "PATANJALI", "DMART", "DABUR", "GODREJCP",
-             "BRITANNIA", "UNITDSPR", "ITC", "TATACONSUM", "KALYANKJIL", "SUPREMEIND"],
-    "CEMENT": ["SHREECEM", "DALBHARAT", "AMBUJACEM", "ULTRACEMCO"],
-    "FINANCE": ["PNBHOUSING", "BAJAJFINSV", "ICICIPRULI", "NUVAMA", "HDFCLIFE", "SAMMAANCAP", "ANGELONE", "RECLTD", "BAJFINANCE", "BSE",
-                "MAXHEALTH", "ICICIGI", "HUDCO", "CHOLAFIN", "PFC", "HDFCAMC", "MUTHOOTFIN", "PAYTM", "JIOFIN", "SHRIRAMFIN", "SBICARD",
-                "POLICYBZR", "SBILIFE", "LICHSGFIN", "LICI", "MANAPPURAM", "IRFC", "IIFL", "CDSL"],
-    "BANK": ["IDFCFIRSTB", "FEDERALBNK", "INDUSINDBK", "HDFCBANK", "SBIN", "KOTAKBANK", "AUBANK", "CANBK", "BANDHANBNK", "RBLBANK", "ICICIBANK", "AXISBANK"],
-    "NIFTY_50": ["ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BEL", "BHARTIARTL",
-                 "CIPLA", "COALINDIA", "DRREDDY", "EICHERMOT", "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE", "HINDALCO", "HINDUNILVR",
-                 "ICICIBANK", "INFY", "INDIGO", "ITC", "JIOFIN", "JSWSTEEL", "KOTAKBANK", "LT", "M&M", "MARUTI", "MAXHEALTH", "NESTLEIND", "NTPC",
-                 "ONGC", "POWERGRID", "RELIANCE", "SBILIFE", "SHRIRAMFIN", "SBIN", "SUNPHARMA", "TCS", "TATACONSUM", "TATASTEEL", "TECHM", "TITAN",
-                 "TRENT", "ULTRACEMCO", "WIPRO", "TATAMOTORS", "ETERNAL"],
-    "MIDCAP": ["RVNL", "MPHASIS", "HINDPETRO", "PAGEIND", "POLYCAB", "LUPIN", "IDFCFIRSTB", "CONCOR", "CUMMINSIND", "VOLTAS", "BHARATFORG",
-               "FEDERALBNK", "INDHOTEL", "COFORGE", "ASHOKLEY", "PERSISTENT", "UPL", "GODREJPROP", "AUROPHARMA", "AUBANK", "ASTRAL", "HDFCAMC",
-               "JUBLFOOD", "PIIND"],
+    "METAL": ["ADANIENT","HINDALCO","JSWSTEEL","HINDZINC","APLAPOLLO","TATASTEEL","JINDALSTEL","VEDL","SAIL","NATIONALUM","NMDC"],
+    "PSUS": ["BANKINDIA","PNB","INDIANB","SBIN","UNIONBANK","BANKBARODA","CANBK"],
+    "REALTY": ["PHOENIXLTD","GODREJPROP","LODHA","OBEROIRLTY","DLF","PRESTIGE","NBCC","NCC"],
+    "ENERGY": ["CGPOWER","RELIANCE","GMRAIRPORT","JSWENERGY","ONGC","POWERGRID","BLUESTARCO","COALINDIA","SUZLON","IREDA",
+               "IOC","IGL","TATAPOWER","INOXWIND","MAZDOCK","PETRONET","SOLARINDS","ADANIGREEN","NTPC","OIL","BDL","BPCL",
+               "NHPC","POWERINDIA","ADANIENSOL","HINDPETRO","TORNTPOWER"],
+    "AUTO": ["BOSCHLTD","TIINDIA","HEROMOTOCO","M&M","EICHERMOT","EXIDEIND","BAJAJ-AUTO","ASHOKLEY","MARUTI","TITAGARH",
+             "TVSMOTOR","MOTHERSON","SONACOMS","UNOMINDA","TMPV","BHARATFORG"],
+    "IT": ["KAYNES","TATATECH","LTIM","CYIENT","MPHASIS","TCS","CAMS","OFSS","HFCL","TECHM","TATAELXSI","HCLTECH","WIPRO",
+           "KPITTECH","COFORGE","PERSISTENT","INFY"],
+    "PHARMA": ["CIPLA","ALKEM","BIOCON","DRREDDY","MANKIND","TORNTPHARM","ZYDUSLIFE","DIVISLAB","LUPIN","PPLPHARMA",
+               "LAURUSLABS","FORTIS","AUROPHARMA","GLENMARK","SUNPHARMA"],
+    "FMCG": ["ETERNAL","MARICO","NYKAA","NESTLEIND","VBL","COLPAL","HINDUNILVR","PATANJALI","DMART","DABUR","GODREJCP",
+             "BRITANNIA","UNITDSPR","ITC","TATACONSUM","KALYANKJIL","SUPREMEIND"],
+    "CEMENT": ["SHREECEM","DALBHARAT","AMBUJACEM","ULTRACEMCO"],
+    "FINANCE": ["PNBHOUSING","BAJAJFINSV","ICICIPRULI","NUVAMA","HDFCLIFE","SAMMAANCAP","ANGELONE","RECLTD","BAJFINANCE","BSE",
+                "MAXHEALTH","ICICIGI","HUDCO","CHOLAFIN","PFC","HDFCAMC","MUTHOOTFIN","PAYTM","JIOFIN","SHRIRAMFIN","SBICARD",
+                "POLICYBZR","SBILIFE","LICHSGFIN","LICI","MANAPPURAM","IRFC","IIFL","CDSL"],
+    "BANK": ["IDFCFIRSTB","FEDERALBNK","INDUSINDBK","HDFCBANK","SBIN","KOTAKBANK","AUBANK","CANBK","BANDHANBNK","RBLBANK","ICICIBANK","AXISBANK"],
+    "NIFTY_50": ["ADANIENT","ADANIPORTS","APOLLOHOSP","ASIANPAINT","AXISBANK","BAJAJ-AUTO","BAJFINANCE","BAJAJFINSV","BEL","BHARTIARTL",
+                "CIPLA","COALINDIA","DRREDDY","EICHERMOT","GRASIM","HCLTECH","HDFCBANK","HDFCLIFE","HINDALCO","HINDUNILVR",
+                "ICICIBANK","INFY","INDIGO","ITC","JIOFIN","JSWSTEEL","KOTAKBANK","LT","M&M","MARUTI","MAXHEALTH","NESTLEIND","NTPC",
+                "ONGC","POWERGRID","RELIANCE","SBILIFE","SHRIRAMFIN","SBIN","SUNPHARMA","TCS","TATACONSUM","TATASTEEL","TECHM","TITAN",
+                "TRENT","ULTRACEMCO","WIPRO","TATAMOTORS","ETERNAL"],
+    "MIDCAP": ["RVNL","MPHASIS","HINDPETRO","PAGEIND","POLYCAB","LUPIN","IDFCFIRSTB","CONCOR","CUMMINSIND","VOLTAS","BHARATFORG",
+               "FEDERALBNK","INDHOTEL","COFORGE","ASHOKLEY","PERSISTENT","UPL","GODREJPROP","AUROPHARMA","AUBANK","ASTRAL","HDFCAMC",
+               "JUBLFOOD","PIIND"],
 }
 
 # ---------------------------
@@ -118,6 +118,7 @@ last_snapshot: Dict[str, Any] = {
     "losers": [],
     "movers": [],
     "sectors": [],
+    "sentiment": None,
     "missing_symbols": [],
     "market": {},
     "tick_count": 0,
@@ -156,7 +157,7 @@ def build_sym_to_sectors(sector_defs: dict) -> Dict[str, List[str]]:
     return m
 
 def chunked(lst: List[str], n: int) -> List[List[str]]:
-    return [lst[i:i + n] for i in range(0, len(lst), n)]
+    return [lst[i:i+n] for i in range(0, len(lst), n)]
 
 T = TypeVar("T")
 
@@ -277,6 +278,7 @@ def set_snapshot(note: str, **fields):
         "losers": [],
         "movers": [],
         "sectors": [],
+        "sentiment": None,
         **_snapshot_meta(mkt),
         "note": note,
     }
@@ -287,8 +289,7 @@ def set_snapshot(note: str, **fields):
 def get_20d_stats(k: KiteConnect, token: int, asof: date) -> Dict[str, Optional[float]]:
     """
     Computes 20-session averages using daily candles.
-    Caches result in stats_by_token. On failure, caches None stats
-    to avoid repeated historical-data calls.
+    Caches result in stats_by_token. On failure, caches None stats.
     """
     if token in stats_by_token:
         return stats_by_token[token]
@@ -304,7 +305,7 @@ def get_20d_stats(k: KiteConnect, token: int, asof: date) -> Dict[str, Optional[
             to_date=to_dt,
             interval="day",
             continuous=False,
-            oi=False
+            oi=False,
         )
     except Exception as e:
         st = {"avg_vol_20": None, "avg_range_20": None, "avg_abs_ret_20": None}
@@ -383,10 +384,6 @@ def sector_rankings(df: pd.DataFrame) -> pd.DataFrame:
     return sdf
 
 def _fetch_quotes_sync(k: KiteConnect, syms: List[str]) -> Dict[str, dict]:
-    """
-    Fetch quotes in chunks with retries.
-    If one chunk fails after retries, continue with remaining chunks.
-    """
     quotes: Dict[str, dict] = {}
     parts = chunked(syms, QUOTE_CHUNK_SIZE)
 
@@ -430,7 +427,7 @@ def _build_df_sync(k: KiteConnect, syms: List[str]) -> pd.DataFrame:
             "pct": r["pct"],
             "rfactor": r["rfactor"],
             "dir_rfactor": r["dir_rfactor"],
-            "volume": float(q.get("volume") or 0.0),  # <-- added
+            "volume": float(q.get("volume") or 0.0),
         })
 
     df = pd.DataFrame(rows)
@@ -445,13 +442,29 @@ def build_snapshot(df: pd.DataFrame) -> Dict[str, Any]:
     movers  = df.assign(abs_r=df["rfactor"].abs()).sort_values("abs_r", ascending=False).head(10)
     sdf = sector_rankings(df)
 
+    adv = int((df["pct"] > 0).sum())
+    dec = int((df["pct"] < 0).sum())
+    unch = int((df["pct"] == 0).sum())
+    total = max(1, adv + dec + unch)
+
+    score = (adv - dec) / total  # -1..+1
+    avg_pct = float(df["pct"].mean()) if not df.empty else 0.0
+    avg_dir_r = float(df["dir_rfactor"].mean()) if not df.empty else 0.0
+
+    if score >= 0.20:
+        label = "BULLISH"
+    elif score <= -0.20:
+        label = "BEARISH"
+    else:
+        label = "NEUTRAL"
+
     def rows(d: pd.DataFrame) -> List[dict]:
         return [
             {
                 "symbol": str(r["symbol"]),
                 "pct": float(r["pct"]),
                 "rfactor": float(r["rfactor"]),
-                "volume": float(r.get("volume") or 0.0),  # <-- added
+                "volume": float(r.get("volume") or 0.0),
                 "sectors": sym_to_sectors.get(str(r["symbol"]), []),
             }
             for _, r in d.iterrows()
@@ -472,6 +485,16 @@ def build_snapshot(df: pd.DataFrame) -> Dict[str, Any]:
             }
             for _, row in sdf.iterrows()
         ],
+        "sentiment": {
+            "label": label,
+            "score": float(score),
+            "adv": adv,
+            "dec": dec,
+            "unch": unch,
+            "total": int(total),
+            "avg_pct": float(avg_pct),
+            "avg_dir_rfactor": float(avg_dir_r),
+        },
         "note": "OK",
     }
 
@@ -569,7 +592,7 @@ async def scanner_loop():
                         "symbol": str(r["symbol"]),
                         "pct": float(r["pct"]),
                         "rfactor": float(r["rfactor"]),
-                        "volume": float(r.get("volume") or 0.0),  # <-- added
+                        "volume": float(r.get("volume") or 0.0),
                         "sectors": sym_to_sectors.get(str(r["symbol"]), []),
                     }
                     for _, r in df.iterrows()
