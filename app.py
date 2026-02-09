@@ -27,33 +27,33 @@ log = logging.getLogger("intraday-boost")
 # SECTORS / STOCKS
 # ---------------------------
 SECTOR_DEFINITIONS = {
-    "METAL": ["ADANIENT","HINDALCO","JSWSTEEL","HINDZINC","APLAPOLLO","TATASTEEL","JINDALSTEL","VEDL","SAIL","NATIONALUM","NMDC"],
-    "PSUS": ["BANKINDIA","PNB","INDIANB","SBIN","UNIONBANK","BANKBARODA","CANBK"],
-    "REALTY": ["PHOENIXLTD","GODREJPROP","LODHA","OBEROIRLTY","DLF","PRESTIGE","NBCC","NCC"],
-    "ENERGY": ["CGPOWER","RELIANCE","GMRAIRPORT","JSWENERGY","ONGC","POWERGRID","BLUESTARCO","COALINDIA","SUZLON","IREDA",
-               "IOC","IGL","TATAPOWER","INOXWIND","MAZDOCK","PETRONET","SOLARINDS","ADANIGREEN","NTPC","OIL","BDL","BPCL",
-               "NHPC","POWERINDIA","ADANIENSOL","HINDPETRO","TORNTPOWER"],
-    "AUTO": ["BOSCHLTD","TIINDIA","HEROMOTOCO","M&M","EICHERMOT","EXIDEIND","BAJAJ-AUTO","ASHOKLEY","MARUTI","TITAGARH",
-             "TVSMOTOR","MOTHERSON","SONACOMS","UNOMINDA","TMPV","BHARATFORG"],
-    "IT": ["KAYNES","TATATECH","LTIM","CYIENT","MPHASIS","TCS","CAMS","OFSS","HFCL","TECHM","TATAELXSI","HCLTECH","WIPRO",
-           "KPITTECH","COFORGE","PERSISTENT","INFY"],
-    "PHARMA": ["CIPLA","ALKEM","BIOCON","DRREDDY","MANKIND","TORNTPHARM","ZYDUSLIFE","DIVISLAB","LUPIN","PPLPHARMA",
-               "LAURUSLABS","FORTIS","AUROPHARMA","GLENMARK","SUNPHARMA"],
-    "FMCG": ["ETERNAL","MARICO","NYKAA","NESTLEIND","VBL","COLPAL","HINDUNILVR","PATANJALI","DMART","DABUR","GODREJCP",
-             "BRITANNIA","UNITDSPR","ITC","TATACONSUM","KALYANKJIL","SUPREMEIND"],
-    "CEMENT": ["SHREECEM","DALBHARAT","AMBUJACEM","ULTRACEMCO"],
-    "FINANCE": ["PNBHOUSING","BAJAJFINSV","ICICIPRULI","NUVAMA","HDFCLIFE","SAMMAANCAP","ANGELONE","RECLTD","BAJFINANCE","BSE",
-                "MAXHEALTH","ICICIGI","HUDCO","CHOLAFIN","PFC","HDFCAMC","MUTHOOTFIN","PAYTM","JIOFIN","SHRIRAMFIN","SBICARD",
-                "POLICYBZR","SBILIFE","LICHSGFIN","LICI","MANAPPURAM","IRFC","IIFL","CDSL"],
-    "BANK": ["IDFCFIRSTB","FEDERALBNK","INDUSINDBK","HDFCBANK","SBIN","KOTAKBANK","AUBANK","CANBK","BANDHANBNK","RBLBANK","ICICIBANK","AXISBANK"],
-    "NIFTY_50": ["ADANIENT","ADANIPORTS","APOLLOHOSP","ASIANPAINT","AXISBANK","BAJAJ-AUTO","BAJFINANCE","BAJAJFINSV","BEL","BHARTIARTL",
-                "CIPLA","COALINDIA","DRREDDY","EICHERMOT","GRASIM","HCLTECH","HDFCBANK","HDFCLIFE","HINDALCO","HINDUNILVR",
-                "ICICIBANK","INFY","INDIGO","ITC","JIOFIN","JSWSTEEL","KOTAKBANK","LT","M&M","MARUTI","MAXHEALTH","NESTLEIND","NTPC",
-                "ONGC","POWERGRID","RELIANCE","SBILIFE","SHRIRAMFIN","SBIN","SUNPHARMA","TCS","TATACONSUM","TATASTEEL","TECHM","TITAN",
-                "TRENT","ULTRACEMCO","WIPRO","TATAMOTORS","ETERNAL"],
-    "MIDCAP": ["RVNL","MPHASIS","HINDPETRO","PAGEIND","POLYCAB","LUPIN","IDFCFIRSTB","CONCOR","CUMMINSIND","VOLTAS","BHARATFORG",
-               "FEDERALBNK","INDHOTEL","COFORGE","ASHOKLEY","PERSISTENT","UPL","GODREJPROP","AUROPHARMA","AUBANK","ASTRAL","HDFCAMC",
-               "JUBLFOOD","PIIND"],
+    "METAL": ["ADANIENT", "HINDALCO", "JSWSTEEL", "HINDZINC", "APLAPOLLO", "TATASTEEL", "JINDALSTEL", "VEDL", "SAIL", "NATIONALUM", "NMDC"],
+    "PSUS": ["BANKINDIA", "PNB", "INDIANB", "SBIN", "UNIONBANK", "BANKBARODA", "CANBK"],
+    "REALTY": ["PHOENIXLTD", "GODREJPROP", "LODHA", "OBEROIRLTY", "DLF", "PRESTIGE", "NBCC", "NCC"],
+    "ENERGY": ["CGPOWER", "RELIANCE", "GMRAIRPORT", "JSWENERGY", "ONGC", "POWERGRID", "BLUESTARCO", "COALINDIA", "SUZLON", "IREDA",
+               "IOC", "IGL", "TATAPOWER", "INOXWIND", "MAZDOCK", "PETRONET", "SOLARINDS", "ADANIGREEN", "NTPC", "OIL", "BDL", "BPCL",
+               "NHPC", "POWERINDIA", "ADANIENSOL", "HINDPETRO", "TORNTPOWER"],
+    "AUTO": ["BOSCHLTD", "TIINDIA", "HEROMOTOCO", "M&M", "EICHERMOT", "EXIDEIND", "BAJAJ-AUTO", "ASHOKLEY", "MARUTI", "TITAGARH",
+             "TVSMOTOR", "MOTHERSON", "SONACOMS", "UNOMINDA", "TMPV", "BHARATFORG"],
+    "IT": ["KAYNES", "TATATECH", "LTIM", "CYIENT", "MPHASIS", "TCS", "CAMS", "OFSS", "HFCL", "TECHM", "TATAELXSI", "HCLTECH", "WIPRO",
+           "KPITTECH", "COFORGE", "PERSISTENT", "INFY"],
+    "PHARMA": ["CIPLA", "ALKEM", "BIOCON", "DRREDDY", "MANKIND", "TORNTPHARM", "ZYDUSLIFE", "DIVISLAB", "LUPIN", "PPLPHARMA",
+               "LAURUSLABS", "FORTIS", "AUROPHARMA", "GLENMARK", "SUNPHARMA"],
+    "FMCG": ["ETERNAL", "MARICO", "NYKAA", "NESTLEIND", "VBL", "COLPAL", "HINDUNILVR", "PATANJALI", "DMART", "DABUR", "GODREJCP",
+             "BRITANNIA", "UNITDSPR", "ITC", "TATACONSUM", "KALYANKJIL", "SUPREMEIND"],
+    "CEMENT": ["SHREECEM", "DALBHARAT", "AMBUJACEM", "ULTRACEMCO"],
+    "FINANCE": ["PNBHOUSING", "BAJAJFINSV", "ICICIPRULI", "NUVAMA", "HDFCLIFE", "SAMMAANCAP", "ANGELONE", "RECLTD", "BAJFINANCE", "BSE",
+                "MAXHEALTH", "ICICIGI", "HUDCO", "CHOLAFIN", "PFC", "HDFCAMC", "MUTHOOTFIN", "PAYTM", "JIOFIN", "SHRIRAMFIN", "SBICARD",
+                "POLICYBZR", "SBILIFE", "LICHSGFIN", "LICI", "MANAPPURAM", "IRFC", "IIFL", "CDSL"],
+    "BANK": ["IDFCFIRSTB", "FEDERALBNK", "INDUSINDBK", "HDFCBANK", "SBIN", "KOTAKBANK", "AUBANK", "CANBK", "BANDHANBNK", "RBLBANK", "ICICIBANK", "AXISBANK"],
+    "NIFTY_50": ["ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BEL", "BHARTIARTL",
+                 "CIPLA", "COALINDIA", "DRREDDY", "EICHERMOT", "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE", "HINDALCO", "HINDUNILVR",
+                 "ICICIBANK", "INFY", "INDIGO", "ITC", "JIOFIN", "JSWSTEEL", "KOTAKBANK", "LT", "M&M", "MARUTI", "MAXHEALTH", "NESTLEIND", "NTPC",
+                 "ONGC", "POWERGRID", "RELIANCE", "SBILIFE", "SHRIRAMFIN", "SBIN", "SUNPHARMA", "TCS", "TATACONSUM", "TATASTEEL", "TECHM", "TITAN",
+                 "TRENT", "ULTRACEMCO", "WIPRO", "TATAMOTORS", "ETERNAL"],
+    "MIDCAP": ["RVNL", "MPHASIS", "HINDPETRO", "PAGEIND", "POLYCAB", "LUPIN", "IDFCFIRSTB", "CONCOR", "CUMMINSIND", "VOLTAS", "BHARATFORG",
+               "FEDERALBNK", "INDHOTEL", "COFORGE", "ASHOKLEY", "PERSISTENT", "UPL", "GODREJPROP", "AUROPHARMA", "AUBANK", "ASTRAL", "HDFCAMC",
+               "JUBLFOOD", "PIIND"],
 }
 
 # ---------------------------
@@ -63,7 +63,7 @@ IST = pytz.timezone("Asia/Kolkata")
 
 LOOKBACK_SESSIONS = int(os.getenv("LOOKBACK_SESSIONS", "20"))
 REFRESH_EVERY_SEC = int(os.getenv("REFRESH_EVERY_SEC", "15"))
-QUOTE_CHUNK_SIZE = int(os.getenv("QUOTE_CHUNK_SIZE", "120"))  # safer under load
+QUOTE_CHUNK_SIZE = int(os.getenv("QUOTE_CHUNK_SIZE", "120"))
 QUOTE_CHUNK_SLEEP = float(os.getenv("QUOTE_CHUNK_SLEEP", "0.18"))
 
 KITE_TIMEOUT_SEC = int(os.getenv("KITE_TIMEOUT_SEC", "15"))
@@ -156,7 +156,7 @@ def build_sym_to_sectors(sector_defs: dict) -> Dict[str, List[str]]:
     return m
 
 def chunked(lst: List[str], n: int) -> List[List[str]]:
-    return [lst[i:i+n] for i in range(0, len(lst), n)]
+    return [lst[i:i + n] for i in range(0, len(lst), n)]
 
 T = TypeVar("T")
 
@@ -430,6 +430,7 @@ def _build_df_sync(k: KiteConnect, syms: List[str]) -> pd.DataFrame:
             "pct": r["pct"],
             "rfactor": r["rfactor"],
             "dir_rfactor": r["dir_rfactor"],
+            "volume": float(q.get("volume") or 0.0),  # <-- added
         })
 
     df = pd.DataFrame(rows)
@@ -450,6 +451,7 @@ def build_snapshot(df: pd.DataFrame) -> Dict[str, Any]:
                 "symbol": str(r["symbol"]),
                 "pct": float(r["pct"]),
                 "rfactor": float(r["rfactor"]),
+                "volume": float(r.get("volume") or 0.0),  # <-- added
                 "sectors": sym_to_sectors.get(str(r["symbol"]), []),
             }
             for _, r in d.iterrows()
@@ -562,12 +564,12 @@ async def scanner_loop():
                     "note": "No live rows (quotes missing or stats unavailable).",
                 }
             else:
-                # store full universe rows for sector drilldown
                 universe_rows = [
                     {
                         "symbol": str(r["symbol"]),
                         "pct": float(r["pct"]),
                         "rfactor": float(r["rfactor"]),
+                        "volume": float(r.get("volume") or 0.0),  # <-- added
                         "sectors": sym_to_sectors.get(str(r["symbol"]), []),
                     }
                     for _, r in df.iterrows()
@@ -645,7 +647,7 @@ def api_snapshot():
 def api_sector_stocks(sector: str = ""):
     """
     Returns all stocks for a sector from the latest computed universe_rows,
-    sorted by rfactor DESC (as requested).
+    sorted by rfactor DESC.
     """
     sector = (sector or "").strip().upper()
     if not sector:
